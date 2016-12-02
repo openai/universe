@@ -368,7 +368,7 @@ class AllocatorClient(object):
         resp = self._post_request(route, data={'names': names}, description='refreshing existing allocation')
         return resp
 
-    def allocation_delete(self, id):
+    def allocation_delete(self, id, names):
         route = '/v1/allocations/{}'.format(id)
-        resp = self._post_request(route, {})
+        resp = self._post_request(route, {'names': names}, 'deleting existing allocation')
         return resp
