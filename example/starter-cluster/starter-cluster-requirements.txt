@@ -1,0 +1,6 @@
+boto3>=1.4.2
+click>=6.6
+docker-py==1.10.6
+PyYAML>=3.12
+universe>=0.1.0
+docker-compose>=1.9.0

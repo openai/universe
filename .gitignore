@@ -1,0 +1,17 @@
+.DS_Store
+.ropeproject
+*.pyc
+tags
+*.swo
+*.swp
+*.sqlite
+upload/
+venv
+dist
+*.egg-info
+.idea
+/logs
+/dist
+build/
+/.gitfiles
+/.tox
