@@ -93,6 +93,14 @@ On Ubuntu 14.04:
 
 On OSX:
 
+You might need to install Command Line Tools by running:
+
+.. code:: shell
+
+    xcode-select --install
+
+Or ``numpy`` and ``libjpeg-turbo`` packages:
+
 .. code:: shell
 
     pip install numpy
