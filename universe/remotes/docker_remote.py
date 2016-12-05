@@ -113,6 +113,8 @@ def get_client():
     host = os.environ.get('DOCKER_HOST')
 
     client_api_version = os.environ.get('DOCKER_API_VERSION')
+    if not client_api_version:
+        client_api_version = "auto"
 
     # IP to use for started containers
     if host:
