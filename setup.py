@@ -20,6 +20,7 @@ setup(name='universe',
           'twisted',
           'ujson',
       ],
+      package_data={'universe': 'runtimes.yml'},
       tests_require=['pytest'],
       extras_require={
           'atari': 'gym[atari]',
