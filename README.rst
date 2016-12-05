@@ -80,7 +80,8 @@ On Ubuntu 16.04:
 
 .. code:: shell
 
-    apt-get install golang libjpeg-turbo8-dev make numpy
+    pip install numpy
+    sudo apt-get install golang libjpeg-turbo8-dev make
 
 On Ubuntu 14.04:
 
