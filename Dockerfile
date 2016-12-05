@@ -44,8 +44,6 @@ WORKDIR /usr/local/universe/
 COPY ./setup.py ./
 COPY ./tox.ini ./
 
-# We need bin for our scripts to be found by pip install -e .
-COPY ./bin ./bin
 RUN pip install -e .
 
 # Upload our actual code
