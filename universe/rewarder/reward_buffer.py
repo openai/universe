@@ -66,10 +66,8 @@ class RewardState(object):
             # Only used for the debugging gym-core envs with
             # rewarder_observation set.
             info['rewarder.observation'] = (self._observation, self._episode_id)
-        if self._episode_id is not None:
-            info['env_status.episode_id'] = self._episode_id
-        if self._env_state is not None:
-            info['env_status.env_state'] = self._env_state
+        info['env_status.episode_id'] = self._episode_id
+        info['env_status.env_state'] = self._env_state
         return info
 
     def pop(self):
