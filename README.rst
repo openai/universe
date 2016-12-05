@@ -94,6 +94,7 @@ On OSX:
 
 .. code:: shell
 
+    pip install numpy
     brew install golang libjpeg-turbo
 
 Install Docker
