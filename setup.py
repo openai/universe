@@ -1,7 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(name='universe',
-      version='0.20.0',
+      version='0.20.1',
+      description="Universe: a software platform for measuring and training an AI's general intelligence across the world's supply of games, websites and other applications.",
+      url='https://github.com/openai/universe',
+      author='OpenAI',
+      author_email='universe@openai.com',
       packages=[package for package in find_packages()
                 if package.startswith('universe')],
       install_requires=[
