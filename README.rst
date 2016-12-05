@@ -182,7 +182,8 @@ and will start that image as the remote. (In our `remotes
 <doc/remotes.rst>`__ documentation page, we explain other ways you can run
 remotes.)
 
-If all goes well, a window like the one below will soon pop up. Your
+It will take a few minutes for the image to pull the first time. After that,
+if all goes well, a window like the one below will soon pop up. Your
 agent, which is just pressing the up arrow repeatedly, is now
 playing a Flash racing game called `Dusk Drive
 <http://www.kongregate.com/games/longanimals/dusk-drive>`__. Your agent
