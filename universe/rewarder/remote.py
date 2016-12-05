@@ -233,8 +233,9 @@ class AgentConn(object):
             if stats is not None and stats['active']:
                 self.last_disconnect_time = time.time()
                 active = self.active_clients()
-                if len(active) > 0:
-                    logger.info('[%s] Active client disconnected (sent %d messages), but still have %d active clients left', utils.thread_name(), stats['messages'], len(active))
+                logger.info('[%s] Active client disconnected (sent %d messages). Still have %d active clients left', utils.thread_name(), stats['messages'], len(active))
+            else:
+                logger.info('[%s] Non-active client disconnected', utils.thread_name())
 
             self.control_buffer.client_disconnect(conn, stats)
 
