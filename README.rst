@@ -240,7 +240,7 @@ mean? We'll go line-by-line through the example.
   object which has been `wrapped
   <https://github.com/openai/universe/blob/master/universe/wrappers/__init__.py#L42>`__
   to add a few useful diagnostics and utilities. The ``VNCEnv`` object
-  is the *client* part of the enironment, and it is not yet connected
+  is the *client* part of the environment, and it is not yet connected
   to a *remote*.
 
 .. code:: python
@@ -290,7 +290,7 @@ mean? We'll go line-by-line through the example.
   action by instead submitting ``[('KeyEvent', 'ArrowUp', True),
   ('KeyEvent', 'ArrowUp', False)]`` for each observation.
 
-  In fact the agent could largely have the same effect by just
+  In fact, the agent could largely have the same effect by just
   submitting ``('KeyEvent', 'ArrowUp', True)`` once and then calling
   ``env.step([[] for ob in observation_n])`` thereafter, without ever
   releasing the key using ``('KeyEvent', 'ArrowUp', False)``. The

@@ -187,7 +187,7 @@ If you encounter the following
 
     ERROR: for flashgames-0  no resources available to schedule container
 
-then it means you've run out of compute resources on your cluster, and
+then it means you've run out of computing resources on your cluster, and
 have to add more worker nodes. You can do so by going to the AWS
 Cloudformation console:
 

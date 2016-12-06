@@ -4,7 +4,7 @@ Environment semantics
 Real-time environments
 ======================
 
-Universe environments differ from other Gym enironments in that the
+Universe environments differ from other Gym environments in that the
 environment keeps running in real-time, even when the agent does not
 call ``step``. This has a few important implications:
 

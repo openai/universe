@@ -24,7 +24,7 @@ Each remote exposes two ports:
   mouse inputs over VNC as well.
 
 - A rewarder port (15900 by default). The rewarder protocol is a
-  bi-directional JSON protocol run over WebSockets. The rewarder
+  bi-directional JSON protocol runs over WebSockets. The rewarder
   channel provides more than just a reward signal; in addition, it allows the
   agent to submit control commands (such as to indicating which of
   the available environments should be active for a given runtime) and
