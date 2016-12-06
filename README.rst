@@ -99,11 +99,11 @@ You might need to install Command Line Tools by running:
 
     xcode-select --install
 
-Or ``numpy`` and ``libjpeg-turbo`` packages:
+Or ``numpy``, ``libjpeg-turbo`` and ``incremental`` packages:
 
 .. code:: shell
 
-    pip install numpy
+    pip install numpy incremental
     brew install golang libjpeg-turbo
 
 Install Docker
@@ -263,7 +263,7 @@ mean? We'll go line-by-line through the example.
   environments run in real-time, rather than stepping synchronously
   with the agent's actions, so ``reset`` is asynchronous and returns
   immediately. Since the environment will not have waited to finish
-  connecting to the VNC server before returning, the initial observations 
+  connecting to the VNC server before returning, the initial observations
   from ``reset`` will be ``None`` to indicate that there is
   not yet a valid observation.
 
