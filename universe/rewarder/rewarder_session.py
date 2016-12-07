@@ -292,15 +292,11 @@ class RewarderSession(object):
         if episode_id is None:
             episode_id = client.factory.env_status.episode_id
         logger.info('[%s] Sending reset for env_id=%s fps=%s episode_id=%s', client.factory.label, client.factory.arg_env_id, client.factory.arg_fps, episode_id)
-        d = client.send_reset(
+        return client.send_reset(
             env_id=client.factory.arg_env_id,
             seed=seed,
             fps=client.factory.arg_fps,
             episode_id=episode_id)
-        def fail(reason):
-            client.factory.record_error(reason)
-        d.addErrback(fail)
-        return d
 
     def pop(self, warn=True, peek_d=None):
         reward_d = {}
