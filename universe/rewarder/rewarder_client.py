@@ -64,9 +64,7 @@ class RewarderClient(websocket.WebSocketClientProtocol):
                 error_message += ": {}".format(self._close_message)
             e = error.Error(error_message)
             if expect_reply:
-                d = defer.Deferred()
-                d.errback(e)
-                return d
+                return defer.fail(e)
             else:
                 raise e
 
