@@ -8,6 +8,16 @@ def test_prereset():
     assert done is False
     print(info)
 
+def test_mask_peek():
+    buf = reward_buffer.RewardBuffer('buf')
+    buf.set_env_info('running', 'test-v0', '1', fps=60)
+    buf.push('1', 1, False, {'key': 'value'})
+    reward, done, info = buf.pop(peek=True)
+    assert info['env_status.episode_id'] is None
+    assert info['env_status.env_state'] is None
+    assert info['env_status.peek.episode_id'] is None
+    assert info['env_status.peek.env_state'] is None
+
 def test_single():
     buf = reward_buffer.RewardBuffer('buf')
     buf.reset('1')

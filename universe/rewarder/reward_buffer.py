@@ -175,14 +175,21 @@ class RewardBuffer(object):
                 max_id = self._max_id()
                 reward_state = self.reward_state(self._current_episode_id)
                 peek_state = self.reward_state(max_id)
+                peek_id = peek_state._episode_id
+                peek_state = peek_state._env_state
+                if self._masked:
+                    assert reward_state._episode_id is None
+                    assert reward_state._env_state is None
+                    peek_id = None
+                    peek_state = None
                 return 0, False, {
                     'peek': True,
 
                     'env_status.episode_id': reward_state._episode_id,
                     'env_status.env_state': reward_state._env_state,
 
-                    'env_status.peek.episode_id': peek_state._episode_id,
-                    'env_status.peek.env_state': peek_state._env_state,
+                    'env_status.peek.episode_id': peek_id,
+                    'env_status.peek.env_state': peek_state,
                 }
 
             reward, done, info = self.reward_state(self._current_episode_id).pop()
