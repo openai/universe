@@ -160,7 +160,7 @@ The code in this repository corresponds to the **client** side of the
 Universe environments. Additionally, you can freely access the Docker
 images for the **remotes**. We'll release the source repositories for
 the remotes in the future, along with tools to enable users to
-integrate new environments in the future. Please sign up for our `beta
+integrate new environments. Please sign up for our `beta
 <https://docs.google.com/forms/d/e/1FAIpQLScAiW-kIS0mz6hdzzFZJJFlXlicDvQs1TX9XMEkipNwjV5VlA/viewform>`_
 if you'd like early access.
 
