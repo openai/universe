@@ -75,6 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--reuse', default=False, action='store_true', help='Reuse existing Docker container if present, and leave this one running after (only for "-r n")')
     parser.add_argument('-f', '--fps', default=60., type=float, help='Desired frames per second')
     parser.add_argument('-N', '--max-steps', type=int, default=10**7, help='Maximum number of steps to take')
+    parser.add_argument('-E', '--max-episodes', type=int, default=10**7, help='Maximum number of episodes')
     args = parser.parse_args()
 
     logging.getLogger('gym').setLevel(logging.NOTSET)
@@ -144,6 +145,8 @@ if __name__ == '__main__':
     episode_length = np.zeros(env.n)
     episode_score = np.zeros(env.n)
 
+    episodes_completed = 0
+
     for i in range(args.max_steps):
         # print(observation_n)
         # user_input.handle_events()
@@ -188,6 +191,10 @@ if __name__ == '__main__':
         errored = [i for i, info_i in enumerate(info['n']) if 'error' in info_i]
         if errored:
             logger.info('had errored indexes: %s: %s', errored, info)
+
+        episodes_completed += len([d for d in done_n if d])
+        if episodes_completed >= args.max_episodes:
+            break
 
         # if info.get('n') and info['n'][0].get('env_status.instruction'):
         #     logger.info('received instruction = %s', info['n'][0]['env_status.instruction'])
