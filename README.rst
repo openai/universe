@@ -89,7 +89,7 @@ On Ubuntu 14.04:
 
     sudo add-apt-repository ppa:ubuntu-lxc/lxd-stable  # for newer golang
     sudo apt-get update
-    apt-get install golang libjpeg-turbo8-dev make
+    sudo apt-get install golang libjpeg-turbo8-dev make
 
 On OSX:
 
