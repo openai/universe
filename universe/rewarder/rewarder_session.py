@@ -247,15 +247,15 @@ class RewarderSession(object):
                 d.errback(utils.format_error(reason))
             except defer.AlreadyCalledError:
                 raise
-        res = endpoint.connect(factory)
-        res.addCallback(log, '[%s] Rewarder TCP connection established', factory.label)
-        res.addErrback(websocket_failed, 'Could not establish rewarder TCP connection')
-        res.addErrback(connection_failed)
+        d = endpoint.connect(factory)
+        d.addCallback(log, '[%s] Rewarder TCP connection established', factory.label)
+        d.addErrback(websocket_failed, 'Could not establish rewarder TCP connection')
+        d.addErrback(connection_failed) # TODO: This is never called.
 
-        res.addCallback(lambda client: client.waitForWebsocketConnection())
-        res.addCallback(connected)
-        res.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
-        res.addErrback(fail)
+        d.addCallback(lambda client: client.waitForWebsocketConnection())
+        d.addCallback(connected)
+        d.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
+        d.addErrback(fail) # TODO: This is never called.
 
     def pop_errors(self):
         errors = {}
