@@ -98,6 +98,7 @@ class RewarderSession(object):
     # Call only from Twisted thread
 
     # TODO: probably time to convert to kwargs
+    @defer.inlineCallbacks
     def _connect(self, name, address, env_id, seed, fps, i, network, env_status, reward_buffer,
                  label, password, start_timeout,
                  observer, skip_network_calibration,
@@ -247,15 +248,25 @@ class RewarderSession(object):
                 d.errback(utils.format_error(reason))
             except defer.AlreadyCalledError:
                 raise
-        d = endpoint.connect(factory)
-        d.addCallback(log, '[%s] Rewarder TCP connection established', factory.label)
-        d.addErrback(websocket_failed, 'Could not establish rewarder TCP connection')
-        d.addErrback(connection_failed) # TODO: This is never called.
+        try:
+            client = yield endpoint.connect(factory)
+        except Exception as e:
+            websocket_failed(e, 'Could not establish rewarder TCP connection')
+            # TODO: remove? original code intended to call this, but never did.
+            # connection_failed(e)
+        extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
 
-        d.addCallback(lambda client: client.waitForWebsocketConnection())
-        d.addCallback(connected)
-        d.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
-        d.addErrback(fail) # TODO: This is never called.
+        try:
+            yield client.waitForWebsocketConnection()
+        except Exception as e:
+            websocket_failed(e, 'TCP connection established but WebSocket handshake failed')
+            # TODO: remove? original code intended to call this, but never did.
+            # d.addErrback(fail)
+
+        try:
+            yield connected(client)
+        except Exception as e:
+            fail(e)
 
     def pop_errors(self):
         errors = {}
