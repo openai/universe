@@ -26,6 +26,8 @@ class RewarderClient(websocket.WebSocketClientProtocol):
         self._reset = None
         self._initial_reset = False
 
+        self._connection_result = defer.Deferred()
+
     def send_reset(self, env_id, seed, fps, episode_id):
         self._initial_reset = True
         self._reset = {
@@ -50,10 +52,12 @@ class RewarderClient(websocket.WebSocketClientProtocol):
 
         self.reward_buffer = self.factory.reward_buffer
 
-        self.factory.deferred.callback(self)
-        # Make sure we don't accidentally try to double call it
-        self.factory.deferred = None
+        assert not self._connection_result.called
+        self._connection_result.callback(self)
         self._connected = True
+
+    def waitForWebsocketConnection(self):
+        return self._connection_result
 
     def send(self, method, body, headers=None, expect_reply=False):
         if headers is None:
@@ -194,9 +198,8 @@ class RewarderClient(websocket.WebSocketClientProtocol):
             return
 
         if not self._connected:
-            self.factory.deferred.errback(error.ConnectionError(reason))
-            # Make sure we don't accidentally try to double call it
-            self.factory.deferred = None
+            assert not self._connection_result.called
+            self._connection_result.errback(error.ConnectionError(reason))
             return
 
         if not self._closed:

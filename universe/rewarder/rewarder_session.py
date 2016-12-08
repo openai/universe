@@ -236,14 +236,10 @@ class RewarderSession(object):
                 d.addErrback(websocket_failed, 'WebSocket handshake established but calibration failed')
                 d.addErrback(fail)
 
-        d = defer.Deferred()
-        d.addCallbacks(connected)
-        d.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
-        d.addErrback(fail)
-        factory.deferred = d
+        def log(result, *args):
+            extra_logger.info(*args)
+            return result
 
-        def connection_succeeded(conn):
-            extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
         def connection_failed(reason):
             reason = error.Error('[{}] Connection failed: {}'.format(factory.label, reason.value))
 
@@ -252,9 +248,14 @@ class RewarderSession(object):
             except defer.AlreadyCalledError:
                 raise
         res = endpoint.connect(factory)
-        res.addCallback(connection_succeeded)
+        res.addCallback(log, '[%s] Rewarder TCP connection established', factory.label)
         res.addErrback(websocket_failed, 'Could not establish rewarder TCP connection')
         res.addErrback(connection_failed)
+
+        res.addCallback(lambda client: client.waitForWebsocketConnection())
+        res.addCallback(connected)
+        res.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
+        res.addErrback(fail)
 
     def pop_errors(self):
         errors = {}
