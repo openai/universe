@@ -190,52 +190,38 @@ class RewarderSession(object):
         def fail(reason):
             factory.record_error(reason)
 
-        def connected(client):
-            extra_logger.info('[%s] Websocket client successfully connected', factory.label)
+        def calibrate_success(network):
+            extra_logger.info('[%s] Network calibration complete', factory.label)
 
-            # Websocket client has come up fully. Time to start on the
-            # next level of our callback chain. (There must be a
-            # better way to write this.)
-            def calibrate_success(network):
-                extra_logger.info('[%s] Network calibration complete', factory.label)
-
-                def reset_success(reply):
-                    # We're connected and have measured the
-                    # network. Mark everything as ready to go.
-                    with self.lock:
-                        if factory.i not in self.names_by_id:
-                            # ID has been popped!
-                            logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
-                            client.close()
-                        elif reply is None:
-                            logger.info('[%s] Attached to running environment without reset', factory.label)
-                        else:
-                            context, req, rep = reply
-                            logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
-                        self.clients[factory.i] = client
+            def reset_success(reply):
+                # We're connected and have measured the
+                # network. Mark everything as ready to go.
+                with self.lock:
+                    if factory.i not in self.names_by_id:
+                        # ID has been popped!
+                        logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
+                        client.close()
+                    elif reply is None:
+                        logger.info('[%s] Attached to running environment without reset', factory.label)
+                    else:
+                        context, req, rep = reply
+                        logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
+                    self.clients[factory.i] = client
 
 
-                if factory.arg_env_id is not None:
-                    # We aren't picky about episode ID: we may have
-                    # already receieved an env.describe message
-                    # telling us about a resetting environment, which
-                    # we don't need to bump post.
-                    #
-                    # tl;dr hardcoding 0.0 here avoids a double reset.
-                    d = self._send_env_reset(client, seed=seed, episode_id='0')
-                    d.addCallback(reset_success)
-                    d.addErrback(fail)
-                else:
-                    # No env_id requested, so we just proceed without a reset
-                    reset_success(None)
-
-            if skip_network_calibration:
-                calibrate_success(network)
-            else:
-                d = network.calibrate(client)
-                d.addCallback(calibrate_success)
-                d.addErrback(websocket_failed, 'WebSocket handshake established but calibration failed')
+            if factory.arg_env_id is not None:
+                # We aren't picky about episode ID: we may have
+                # already receieved an env.describe message
+                # telling us about a resetting environment, which
+                # we don't need to bump post.
+                #
+                # tl;dr hardcoding 0.0 here avoids a double reset.
+                d = self._send_env_reset(client, seed=seed, episode_id='0')
+                d.addCallback(reset_success)
                 d.addErrback(fail)
+            else:
+                # No env_id requested, so we just proceed without a reset
+                reset_success(None)
 
         def log(result, *args):
             extra_logger.info(*args)
@@ -261,10 +247,19 @@ class RewarderSession(object):
         except Exception as e:
             websocket_failed(e, 'TCP connection established but WebSocket handshake failed')
             # TODO: remove? original code intended to call this, but never did.
-            # d.addErrback(fail)
+            # fail(e)
+
+        extra_logger.info('[%s] Websocket client successfully connected', factory.label)
+        if not skip_network_calibration:
+            try:
+                yield network.calibrate(client)
+            except Exception as e:
+                websocket_failed(e, 'WebSocket handshake established but calibration failed')
+                # TODO: remove? original code intended to call this, but never did.
+                # fail(e)
 
         try:
-            yield connected(client)
+            calibrate_success(network)
         except Exception as e:
             fail(e)
 
