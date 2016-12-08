@@ -137,7 +137,7 @@ class RewarderSession(object):
                     extra_logger.info('[%s] Recording fatal error for connection: %s', label, e)
                     self.errors[factory.i] = e
 
-        def websocket_failed(e):
+        def websocket_failed(e, error_message):
             if isinstance(e, failure.Failure):
                 e = e.value
 
@@ -150,7 +150,7 @@ class RewarderSession(object):
             # reason.trap(twisted.internet.error.ConnectError, error.ConnectionError)
             if elapsed_sleep_time < start_timeout:
                 sleep = min((2 * attempt+1), 10)
-                logger.error('[%s] Waiting on rewarder: %s. Retry in %ds (slept %ds/%ds): %s', factory.label, websocket_failed.error_message, sleep, elapsed_sleep_time, start_timeout, e)
+                logger.error('[%s] Waiting on rewarder: %s. Retry in %ds (slept %ds/%ds): %s', factory.label, error_message, sleep, elapsed_sleep_time, start_timeout, e)
                 reactor.callLater(
                     sleep, self._connect, name=name, address=address,
                     env_id=env_id, seed=seed, fps=fps, i=i, network=network,
@@ -160,7 +160,7 @@ class RewarderSession(object):
                     observer=observer, skip_network_calibration=skip_network_calibration,
                 )
             else:
-                logger.error('[%s] %s. Retries exceeded (slept %ds/%ds): %s', factory.label, websocket_failed.error_message, elapsed_sleep_time, start_timeout, e)
+                logger.error('[%s] %s. Retries exceeded (slept %ds/%ds): %s', factory.label, error_message, elapsed_sleep_time, start_timeout, e)
                 record_error(e)
 
         def retriable_record_error(e):
@@ -233,14 +233,12 @@ class RewarderSession(object):
             else:
                 d = network.calibrate(client)
                 d.addCallback(calibrate_success)
-                websocket_failed.error_message = 'WebSocket handshake established but calibration failed'
-                d.addErrback(websocket_failed)
+                d.addErrback(websocket_failed, 'WebSocket handshake established but calibration failed')
                 d.addErrback(fail)
 
         d = defer.Deferred()
         d.addCallbacks(connected)
-        websocket_failed.error_message = 'TCP connection established but WebSocket handshake failed'
-        d.addErrback(websocket_failed)
+        d.addErrback(websocket_failed, 'TCP connection established but WebSocket handshake failed')
         d.addErrback(fail)
         factory.deferred = d
 
@@ -255,8 +253,7 @@ class RewarderSession(object):
                 raise
         res = endpoint.connect(factory)
         res.addCallback(connection_succeeded)
-        websocket_failed.error_message = 'Could not establish rewarder TCP connection'
-        res.addErrback(websocket_failed)
+        res.addErrback(websocket_failed, 'Could not establish rewarder TCP connection')
         res.addErrback(connection_failed)
 
     def pop_errors(self):
