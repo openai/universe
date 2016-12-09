@@ -190,38 +190,20 @@ class RewarderSession(object):
         def fail(reason):
             factory.record_error(reason)
 
-        def calibrate_success(network):
-            extra_logger.info('[%s] Network calibration complete', factory.label)
-
-            def reset_success(reply):
-                # We're connected and have measured the
-                # network. Mark everything as ready to go.
-                with self.lock:
-                    if factory.i not in self.names_by_id:
-                        # ID has been popped!
-                        logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
-                        client.close()
-                    elif reply is None:
-                        logger.info('[%s] Attached to running environment without reset', factory.label)
-                    else:
-                        context, req, rep = reply
-                        logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
-                    self.clients[factory.i] = client
-
-
-            if factory.arg_env_id is not None:
-                # We aren't picky about episode ID: we may have
-                # already receieved an env.describe message
-                # telling us about a resetting environment, which
-                # we don't need to bump post.
-                #
-                # tl;dr hardcoding 0.0 here avoids a double reset.
-                d = self._send_env_reset(client, seed=seed, episode_id='0')
-                d.addCallback(reset_success)
-                d.addErrback(fail)
-            else:
-                # No env_id requested, so we just proceed without a reset
-                reset_success(None)
+        def reset_success(reply):
+            # We're connected and have measured the
+            # network. Mark everything as ready to go.
+            with self.lock:
+                if factory.i not in self.names_by_id:
+                    # ID has been popped!
+                    logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
+                    client.close()
+                elif reply is None:
+                    logger.info('[%s] Attached to running environment without reset', factory.label)
+                else:
+                    context, req, rep = reply
+                    logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
+                self.clients[factory.i] = client
 
         def log(result, *args):
             extra_logger.info(*args)
@@ -259,7 +241,19 @@ class RewarderSession(object):
                 # fail(e)
 
         try:
-            calibrate_success(network)
+            extra_logger.info('[%s] Network calibration complete', factory.label)
+            if factory.arg_env_id is not None:
+                # We aren't picky about episode ID: we may have
+                # already receieved an env.describe message
+                # telling us about a resetting environment, which
+                # we don't need to bump post.
+                #
+                # tl;dr hardcoding 0.0 here avoids a double reset.
+                reply = yield self._send_env_reset(client, seed=seed, episode_id='0')
+            else:
+                # No env_id requested, so we just proceed without a reset
+                reply = None
+            reset_success(reply)
         except Exception as e:
             fail(e)
 
