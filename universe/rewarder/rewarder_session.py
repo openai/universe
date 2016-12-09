@@ -190,21 +190,6 @@ class RewarderSession(object):
         def fail(reason):
             factory.record_error(reason)
 
-        def reset_success(reply):
-            # We're connected and have measured the
-            # network. Mark everything as ready to go.
-            with self.lock:
-                if factory.i not in self.names_by_id:
-                    # ID has been popped!
-                    logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
-                    client.close()
-                elif reply is None:
-                    logger.info('[%s] Attached to running environment without reset', factory.label)
-                else:
-                    context, req, rep = reply
-                    logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
-                self.clients[factory.i] = client
-
         def log(result, *args):
             extra_logger.info(*args)
             return result
@@ -253,7 +238,19 @@ class RewarderSession(object):
             else:
                 # No env_id requested, so we just proceed without a reset
                 reply = None
-            reset_success(reply)
+            # We're connected and have measured the
+            # network. Mark everything as ready to go.
+            with self.lock:
+                if factory.i not in self.names_by_id:
+                    # ID has been popped!
+                    logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
+                    client.close()
+                elif reply is None:
+                    logger.info('[%s] Attached to running environment without reset', factory.label)
+                else:
+                    context, req, rep = reply
+                    logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
+                self.clients[factory.i] = client
         except Exception as e:
             fail(e)
 
