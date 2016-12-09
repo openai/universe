@@ -8,7 +8,7 @@ from twisted.python import failure
 from twisted.internet import defer, endpoints
 import twisted.internet.error
 
-from universe import error, utils
+from universe import utils
 from universe.twisty import reactor
 from universe.rewarder import connection_timer, env_status, reward_buffer, rewarder_client
 from universe.utils import display
@@ -172,19 +172,10 @@ class RewarderSession(object):
 
         factory.record_error = record_error
 
-        def connection_failed(reason):
-            reason = error.Error('[{}] Connection failed: {}'.format(factory.label, reason.value))
-
-            try:
-                d.errback(utils.format_error(reason))
-            except defer.AlreadyCalledError:
-                raise
         try:
             client = yield endpoint.connect(factory)
         except Exception as e:
             websocket_failed(e, 'Could not establish rewarder TCP connection')
-            # TODO: remove? original code intended to call this, but never did.
-            # connection_failed(e)
             return
         extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
 
