@@ -134,6 +134,12 @@ class RewarderSession(object):
                 # drop error on the floor if we're already closed
                 if self._already_closed(factory.i):
                     extra_logger.info('[%s] Ignoring error for already closed connection: %s', label, e)
+                elif factory.i not in self.clients:
+                    extra_logger.info('[%s] Received error for connection which has not been fully initialized: %s', label, e)
+                    # We could handle this better, but right now we
+                    # just mark this as a fatal error for the
+                    # backend. Often it actually is.
+                    self.errors[factory.i] = e
                 else:
                     extra_logger.info('[%s] Recording fatal error for connection: %s', label, e)
                     self.errors[factory.i] = e
@@ -164,28 +170,7 @@ class RewarderSession(object):
                 logger.error('[%s] %s. Retries exceeded (slept %ds/%ds): %s', factory.label, error_message, elapsed_sleep_time, start_timeout, e)
                 record_error(e)
 
-        def retriable_record_error(e):
-            """Record an error, unless our connection is still establishing"""
-            if isinstance(e, failure.Failure):
-                e = e.value
-
-            # logger.error('[%s] Recording rewarder error: %s', factory.label, e)
-            with self.lock:
-                # drop error on the floor if we're already closed
-                if factory.i not in self.names_by_id:
-                    record_error(e)
-                elif factory.i not in self.clients:
-                    extra_logger.info('[%s] Received error for connection which has not been fully initialized: %s', label, e)
-                    # We could handle this better, but right now we
-                    # just mark this as a fatal error for the
-                    # backend. Often it actually is.
-                    #
-                    # If we break again, don't recurse; just skip to
-                    # the direct error recording.
-                    record_error(e)
-                else:
-                    record_error(e)
-        factory.record_error = retriable_record_error
+        factory.record_error = record_error
 
         def fail(reason):
             factory.record_error(reason)
