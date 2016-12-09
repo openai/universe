@@ -203,6 +203,7 @@ class RewarderSession(object):
             websocket_failed(e, 'Could not establish rewarder TCP connection')
             # TODO: remove? original code intended to call this, but never did.
             # connection_failed(e)
+            return
         extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
 
         try:
@@ -211,6 +212,7 @@ class RewarderSession(object):
             websocket_failed(e, 'TCP connection established but WebSocket handshake failed')
             # TODO: remove? original code intended to call this, but never did.
             # fail(e)
+            return
 
         extra_logger.info('[%s] Websocket client successfully connected', factory.label)
         if not skip_network_calibration:
@@ -220,6 +222,7 @@ class RewarderSession(object):
                 websocket_failed(e, 'WebSocket handshake established but calibration failed')
                 # TODO: remove? original code intended to call this, but never did.
                 # fail(e)
+                return
 
         try:
             extra_logger.info('[%s] Network calibration complete', factory.label)
@@ -249,6 +252,7 @@ class RewarderSession(object):
                 self.clients[factory.i] = client
         except Exception as e:
             fail(e)
+            return
 
     def pop_errors(self):
         errors = {}
