@@ -144,7 +144,7 @@ class RewarderSession(object):
                     extra_logger.info('[%s] Recording fatal error for connection: %s', label, e)
                     self.errors[factory.i] = e
 
-        def websocket_failed(e, error_message):
+        def retriable_error(e, error_message):
             if isinstance(e, failure.Failure):
                 e = e.value
 
@@ -173,24 +173,21 @@ class RewarderSession(object):
         factory.record_error = record_error
 
         try:
-            state = 'establish rewarder TCP connection'
+            retry_msg = 'establish rewarder TCP connection'
             client = yield endpoint.connect(factory)
             extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
 
-            state = 'complete WebSocket handshake'
+            retry_msg = 'complete WebSocket handshake'
             yield client.waitForWebsocketConnection()
             extra_logger.info('[%s] Websocket client successfully connected', factory.label)
 
             if not skip_network_calibration:
-                state = 'run network calibration'
+                retry_msg = 'run network calibration'
                 yield network.calibrate(client)
                 extra_logger.info('[%s] Network calibration complete', factory.label)
 
-        except Exception as e:
-            websocket_failed(e, 'failed to ' + state)
-            return
+            retry_msg = ''
 
-        try:
             if factory.arg_env_id is not None:
                 # We aren't picky about episode ID: we may have
                 # already receieved an env.describe message
@@ -216,8 +213,10 @@ class RewarderSession(object):
                     logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
                 self.clients[factory.i] = client
         except Exception as e:
-            record_error(e)
-            return
+            if retry_msg:
+                retriable_error(e, 'failed to ' + retry_msg)
+            else:
+                record_error(e)
 
     def pop_errors(self):
         errors = {}
