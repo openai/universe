@@ -173,28 +173,24 @@ class RewarderSession(object):
         factory.record_error = record_error
 
         try:
+            state = 'establish rewarder TCP connection'
             client = yield endpoint.connect(factory)
-        except Exception as e:
-            websocket_failed(e, 'Could not establish rewarder TCP connection')
-            return
-        extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
+            extra_logger.info('[%s] Rewarder TCP connection established', factory.label)
 
-        try:
+            state = 'complete WebSocket handshake'
             yield client.waitForWebsocketConnection()
+            extra_logger.info('[%s] Websocket client successfully connected', factory.label)
+
+            if not skip_network_calibration:
+                state = 'run network calibration'
+                yield network.calibrate(client)
+                extra_logger.info('[%s] Network calibration complete', factory.label)
+
         except Exception as e:
-            websocket_failed(e, 'TCP connection established but WebSocket handshake failed')
+            websocket_failed(e, 'failed to ' + state)
             return
 
-        extra_logger.info('[%s] Websocket client successfully connected', factory.label)
-        if not skip_network_calibration:
-            try:
-                yield network.calibrate(client)
-            except Exception as e:
-                websocket_failed(e, 'WebSocket handshake established but calibration failed')
-                return
-
         try:
-            extra_logger.info('[%s] Network calibration complete', factory.label)
             if factory.arg_env_id is not None:
                 # We aren't picky about episode ID: we may have
                 # already receieved an env.describe message
