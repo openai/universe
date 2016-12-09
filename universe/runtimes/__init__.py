@@ -3,7 +3,7 @@ import yaml
 
 from universe.runtimes.registration import register_runtime
 
-with open(os.path.join(os.path.dirname(__file__), '../../runtimes.yml')) as f:
+with open(os.path.join(os.path.dirname(__file__), '../runtimes.yml')) as f:
     spec = yaml.load(f)
 
 # If you have a local repo, do something like

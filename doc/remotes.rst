@@ -220,6 +220,6 @@ The configuration for the runtimes is defined in
 `universe/runtimes/__init__.py <https://github.com/openai/universe/blob/master/universe/runtimes/__init__.py>`__,
 and the specific version number tags for the corresponding Docker
 images are specified in
-`runtimes.yml <https://github.com/openai/universe/blob/master/runtimes.yml>`__.
+`runtimes.yml <https://github.com/openai/universe/blob/master/universe/runtimes.yml>`__.
 
 
