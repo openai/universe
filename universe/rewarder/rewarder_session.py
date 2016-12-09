@@ -149,7 +149,7 @@ class RewarderSession(object):
                 e = e.value
 
             if self._already_closed(factory.i):
-                logger.error('[%s] Giving up on reconnecting, since %d already disconnected', factory.label, factory.i)
+                logger.error('[%s] Got error, but giving up on reconnecting, since %d already disconnected', factory.label, factory.i)
                 return
 
             # Also need to handle DNS errors, so let's just handle everything for now.
@@ -172,9 +172,6 @@ class RewarderSession(object):
 
         factory.record_error = record_error
 
-        def fail(reason):
-            factory.record_error(reason)
-
         def connection_failed(reason):
             reason = error.Error('[{}] Connection failed: {}'.format(factory.label, reason.value))
 
@@ -195,8 +192,6 @@ class RewarderSession(object):
             yield client.waitForWebsocketConnection()
         except Exception as e:
             websocket_failed(e, 'TCP connection established but WebSocket handshake failed')
-            # TODO: remove? original code intended to call this, but never did.
-            # fail(e)
             return
 
         extra_logger.info('[%s] Websocket client successfully connected', factory.label)
@@ -205,8 +200,6 @@ class RewarderSession(object):
                 yield network.calibrate(client)
             except Exception as e:
                 websocket_failed(e, 'WebSocket handshake established but calibration failed')
-                # TODO: remove? original code intended to call this, but never did.
-                # fail(e)
                 return
 
         try:
@@ -236,7 +229,7 @@ class RewarderSession(object):
                     logger.info('[%s] Initial reset complete: episode_id=%s', factory.label, rep['headers']['episode_id'])
                 self.clients[factory.i] = client
         except Exception as e:
-            fail(e)
+            record_error(e)
             return
 
     def pop_errors(self):
