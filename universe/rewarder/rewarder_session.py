@@ -5,7 +5,7 @@ import threading
 import time
 
 from twisted.python import failure
-from twisted.internet import defer, endpoints, task
+from twisted.internet import defer, endpoints
 import twisted.internet.error
 
 from universe import error, utils
@@ -189,10 +189,6 @@ class RewarderSession(object):
 
         def fail(reason):
             factory.record_error(reason)
-
-        def log(result, *args):
-            extra_logger.info(*args)
-            return result
 
         def connection_failed(reason):
             reason = error.Error('[{}] Connection failed: {}'.format(factory.label, reason.value))
