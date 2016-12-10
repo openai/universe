@@ -108,7 +108,6 @@ class FakeRewarderConnection(object):
         factory = websocket.WebSocketClientFactory('ws://'+address)
         factory.reward_buffer = self.reward_buffer
         factory.label = self.label
-        factory.deferred = defer.Deferred()
         self.rewarder_client = rewarder_client.RewarderClient()
         self.rewarder_client.factory = factory
         self.rewarder_client.onConnect(None)
