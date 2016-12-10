@@ -340,8 +340,6 @@ class Network(object):
         self._ntpdate_reversed_clock_skew = None
         self._reversed_clock_skew = None
 
-        # self.clock_skew_strategy = clock_skew_strategy
-
     def active(self):
         with self.lock:
             return self._reversed_clock_skew is not None
@@ -503,10 +501,8 @@ class Network(object):
                 # Ok, all done!
                 if d is not None:
                     d.callback(self)
-        def fail(reason):
-            d.errback(reason)
         ping.addCallback(success)
-        ping.addErrback(fail)
+        ping.addErrback(d.errback)
 
     def _update_exposed_metrics(self):
         with self.lock:
