@@ -14,7 +14,6 @@ import universe
 
 from autobahn.twisted import websocket
 from PIL import Image
-from twisted.internet import defer
 
 from universe.rewarder import rewarder_client, rewarder_session, reward_buffer
 from universe import spaces, wrappers
@@ -179,7 +178,6 @@ def test_describe_handling():
     env.configure(vnc_driver=FakeVNCSession, rewarder_driver=FakeRewarder, remotes='vnc://example.com:5900+15900')
     env.reset()
 
-    rewarder_session = get_rewarder_session(env)
     reward_buffer = get_reward_buffer(env)
     rewarder_client = get_rewarder_client(env)
 
@@ -203,8 +201,6 @@ def test_vnc_env():
     env.configure(vnc_driver=FakeVNCSession, rewarder_driver=FakeRewarder, remotes='vnc://example.com:5900+15900')
     env.reset()
 
-    rewarder_session = get_rewarder_session(env)
-    reward_buffer = get_reward_buffer(env)
     rewarder_client = get_rewarder_client(env)
 
     rewarder_client._manual_recv('v0.env.describe', {'env_id': 'flashgames.DuskDrive-v0', 'env_state': 'resetting', 'fps': 60}, {'episode_id': '1'})
