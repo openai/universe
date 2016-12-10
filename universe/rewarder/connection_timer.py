@@ -1,12 +1,11 @@
 import os
-import random
 import re
 import signal
 import time
 
 from universe import error
 from universe.twisty import reactor
-from twisted.internet import defer, protocol, task
+from twisted.internet import defer, protocol
 import twisted.internet.error
 import logging
 
@@ -17,26 +16,11 @@ class ConnectionTimer(protocol.Protocol):
     def connectionMade(self):
         self.transport.loseConnection()
 
-@defer.inlineCallbacks
-def start(endpoint, max_attempts=1):
-    for i in reversed(range(max_attempts)):
-        try:
-            start = time.time()
-            yield endpoint.connect(
-                protocol.ClientFactory.forProtocol(ConnectionTimer)
-            )
-            defer.returnValue(time.time() - start)
-
-        except Exception as e:
-            if i == 0:
-                raise ConnectionTimerException("Max retries")
-            # some websocket implementations (like websocketcpp) can fail when
-            # connections are lost too quickly
-            backoff = 2 ** (max_attempts - i) + random.randint(42, 100)
-            logger.info('Throttling down websocket creation after connection '
-                        'error (this is normal) - waiting %dms - '
-                        'error details: %s', backoff, e)
-            yield task.deferLater(reactor, backoff / 1000., lambda: None)
+def start(endpoint):
+    start = time.time()
+    return endpoint.connect(
+        protocol.ClientFactory.forProtocol(ConnectionTimer)
+    ).addCallback(lambda _: time.time() - start)
 
 def measure_clock_skew(label, host):
     cmd = ['ntpdate', '-q', '-p', '8', host]
