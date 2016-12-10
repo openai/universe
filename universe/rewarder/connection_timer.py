@@ -17,45 +17,26 @@ class ConnectionTimer(protocol.Protocol):
     def connectionMade(self):
         self.transport.loseConnection()
 
-def connection_timer_factory():
-    factory = protocol.ClientFactory()
-    factory.protocol = ConnectionTimer
-    return factory
+@defer.inlineCallbacks
+def start(endpoint, max_attempts=1):
+    for i in reversed(range(max_attempts)):
+        try:
+            start = time.time()
+            yield endpoint.connect(
+                protocol.ClientFactory.forProtocol(ConnectionTimer)
+            )
+            defer.returnValue(time.time() - start)
 
-class StopWatch(object):
-    def start(self):
-        self.start_time = time.time()
-
-    def stop(self):
-        return time.time() - self.start_time
-
-# TODO: clean this up
-def start(endpoint, max_attempts=0):
-    # Use an object for timing so that we can mutate it within the closure
-    stop_watch = StopWatch()
-
-    def success(client):
-        return stop_watch.stop()
-
-    def error(failure, retry):
-        # some websocket implementations (like websocketcpp) can fail when connections are lost too quickly
-        if retry == 0:
-            raise ConnectionTimerException("Max retries")
-        backoff = 2 ** (max_attempts - retry + 1) + random.randint(42, 100)
-        logger.info('Throttling down websocket creation after connection error (this is normal) - waiting %dms - '
-                    'error details %s', backoff, error)
-        d = task.deferLater(reactor, backoff / 1000., go, retry - 1)
-        return d
-
-    def go(retry):
-        stop_watch.start()
-        factory = connection_timer_factory()
-        d = endpoint.connect(factory)
-        d.addCallback(success)
-        d.addErrback(error, retry)
-        return d
-
-    return go(retry=max_attempts)
+        except Exception as e:
+            if i == 0:
+                raise ConnectionTimerException("Max retries")
+            # some websocket implementations (like websocketcpp) can fail when
+            # connections are lost too quickly
+            backoff = 2 ** (max_attempts - i) + random.randint(42, 100)
+            logger.info('Throttling down websocket creation after connection '
+                        'error (this is normal) - waiting %dms - '
+                        'error details: %s', backoff, e)
+            yield task.deferLater(reactor, backoff / 1000., lambda: None)
 
 def measure_clock_skew(label, host):
     cmd = ['ntpdate', '-q', '-p', '8', host]
