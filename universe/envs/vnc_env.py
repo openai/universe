@@ -129,6 +129,8 @@ class VNCEnv(vectorized.Env):
         self.rewarder_session = None
 
         self._send_actions_over_websockets = False
+        self._skip_network_calibration = False
+
 
     def _seed(self, seed):
         self._seed_value = seed
@@ -291,7 +293,8 @@ class VNCEnv(vectorized.Env):
                 password=rewarder_password,
                 label=self.connection_labels[i],
                 start_timeout=self.remote_manager.start_timeout,
-                observer=self._observer
+                observer=self._observer,
+                skip_network_calibration=self._skip_network_calibration
             )
         else:
             network = None
