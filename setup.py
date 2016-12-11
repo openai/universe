@@ -11,6 +11,7 @@ setup(name='universe',
       install_requires=[
           'autobahn',
           'docker-py==1.10.3',
+          'docker-pycreds==0.2.1',
           'fastzbarlight>=0.0.13',
           'go-vncdriver>=0.4.8',
           'gym>=0.5.2',
