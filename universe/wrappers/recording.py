@@ -31,9 +31,12 @@ for examining traces.
         self._episode_ids = None
         self._step_ids = None
         self._episode_id_counter = 0
+        self._recording_notes = None
+        self._recording_dir = None
+        self._recording_policy = lambda episode_id: False
         self._env_semantics_autoreset = env.metadata.get('semantics.autoreset', False)
 
-    def _configure(self, recording_dir=None, recording_policy=None, **kwargs):
+    def _configure(self, recording_dir=None, recording_policy=None, recording_notes={}, **kwargs):
         """
 Configure the wrapper. To make it record, configure the env with
 env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
@@ -58,6 +61,9 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
         else:
             self._recording_policy = lambda episode_id: False
         logger.info('Running Recording wrapper with recording_dir=%s policy=%s. To change this, pass recording_dir="..." to env.configure.', self._recording_dir, recording_policy)
+
+        self._recording_notes = recording_notes
+
         super(Recording, self)._configure(**kwargs)
         if self._recording_dir is not None:
             os.makedirs(self._recording_dir, exist_ok=True)
@@ -96,6 +102,9 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
         for i in range(self.n):
             writer = self._get_writer(i)
             if writer is not None:
+                if self._recording_notes is not None:
+                    writer(type='notes', notes=self._recording_notes)
+                    self._recording_notes = None
                 writer(type='reset', timestamp=time.time())
 
         return self.env.reset()
