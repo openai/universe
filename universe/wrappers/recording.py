@@ -4,6 +4,7 @@ import os
 import json
 import numpy as np
 from universe import rewarder, spaces, vectorized
+from universe.utils import random_alphanumeric
 
 logger = logging.getLogger(__name__)
 extra_logger = logging.getLogger('universe.extra.'+__name__)
@@ -23,7 +24,6 @@ The universe-viewer project (http://github.com/openai/universe-viewer) provides 
 for examining traces.
 
 """
-    instance_id_counter = 1
 
     def __init__(self, env):
         super(Recording, self).__init__(env)
@@ -70,8 +70,8 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
         self._episode_ids = [self._get_episode_id() for i in range(self.n)]
         self._step_ids = [0] * self.n
 
-        self._instance_id = Recording.instance_id_counter
-        Recording.instance_id_counter += 1
+
+        self._instance_id = random_alphanumeric(6)
 
     def _get_episode_id(self):
         ret = self._episode_id_counter
