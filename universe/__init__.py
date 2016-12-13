@@ -1498,7 +1498,7 @@ register(
 )
 
 # VNCInternet-v0
-for slith_game in ['SlitherIO-v0']:
+for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
     register(
         id='internet.' + slith_game,
         entry_point='universe.wrappers:WrappedInternetEnv',
