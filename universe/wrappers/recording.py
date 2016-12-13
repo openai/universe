@@ -186,5 +186,5 @@ class RecordingAnnotator(object):
         self.writer = writer
         self.episode_id = episode_id
         self.step_id = step_id
-    def __call__(self, *args, **kwargs):
+    def __call__(self, **kwargs):
         self.writer.__call__(type='annotate', episode_id=self.episode_id, step_id=self.step_id, **kwargs)
