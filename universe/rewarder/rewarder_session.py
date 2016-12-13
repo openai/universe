@@ -34,7 +34,7 @@ class RewarderSession(object):
 
         self.clients = {}
 
-    def close(self, name=None):
+    def close(self, name=None, reason='closed by RewarderSession.close'):
         if name is None:
             names = list(self.names_by_id.values())
         else:
@@ -59,12 +59,12 @@ class RewarderSession(object):
 
                 client = self.clients.pop(id, None)
                 if client is not None:
-                    reactor.callFromThread(client.close)
+                    reactor.callFromThread(client.close, reason=reason)
 
     def connect(self, name, address, label, password, env_id=None, seed=None, fps=60,
                 start_timeout=None, observer=False, skip_network_calibration=False):
         if name in self.reward_buffers:
-            self.close(name)
+            self.close(name, reason='closing previous connection to reconnect with the same name')
 
         network = Network()
         self.names_by_id[self.i] = name
@@ -205,7 +205,7 @@ class RewarderSession(object):
                 if factory.i not in self.names_by_id:
                     # ID has been popped!
                     logger.info('[%s] Rewarder %d started, but has already been closed', factory.label, factory.i)
-                    client.close()
+                    client.close(reason='RewarderSession: double-closing, client was closed while RewarderSession was starting')
                 elif reply is None:
                     logger.info('[%s] Attached to running environment without reset', factory.label)
                 else:

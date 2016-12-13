@@ -134,6 +134,7 @@ class RewarderProtocol(websocket.WebSocketServerProtocol):
 
     def reject(self, message):
         self.send_message('v0.connection.close', {'message': message}, {})
+        self.sendClose(code=1000, reason=message)
         self.transport.loseConnection()
 
 class ControlBuffer(object):

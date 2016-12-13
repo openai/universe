@@ -208,13 +208,13 @@ class RewarderClient(websocket.WebSocketClientProtocol):
             # TODO: it's not an error if we requested it
             self.factory.record_error(reason)
         else:
-            reason = error.Error("Connection already closed: {}".format(reason))
+            reason = error.Error("We closed the connection: {}".format(reason))
 
         for request, d in self._requests.values():
             d.errback(reason)
 
+    def close(self, code=1000, reason=None):
         self._closed = True
-
-    def close(self):
-        self._closed = True
+        extra_logger.info('[%s] Client closing websocket connection because of call to close(code=%s, reason=%s)', self.factory.label, code, reason)
+        self.sendClose(code, reason)
         self.transport.loseConnection()
