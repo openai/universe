@@ -17,6 +17,7 @@ warnings.filterwarnings(
 
 from gym.envs.registration import register
 
+import universe.scoreboard
 import universe.configuration
 from universe import error, envs
 from universe.remotes import docker_remote
