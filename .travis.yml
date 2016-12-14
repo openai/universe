@@ -3,8 +3,11 @@ python:
   - "3.5"
 services:
   - docker
+before_install:
+  - docker login quay.io -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker build -f test.dockerfile -t quay.io/openai/universe:test .
 script:
-  - docker run -v $(pwd):/usr/local/universe -v /usr/bin/docker:/usr/bin/docker -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock --net=host quay.io/openai/universe:test
+  - docker run -v /usr/bin/docker:/usr/bin/docker -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock --net=host quay.io/openai/universe:test
 notifications:
   slack:
     secure: HtkwTGU+cQbpQuRaMuC2ZcuaaJfUBEZxSaChkj74lFulHAc6g/Xj1ztzj/roR/kMl3dycYPl5QL5AkxPPD/x8BweOJmgabe9boPbU9+80tpa0ueZnt0q6vX23ZA7EcqIAOwQqHiaklxoCkSflpV2N9GP20yBf5YNneHWsbFc8RDuJmNsg8s+1sZIrT3aOcvAJmu8WrNVclKvnpH/qCtvkK6npXZvdMvGpQPT/uCYOyPcbURqelk7qzNpT0oJmkrutbkT3Hp03NRDEQgS47pTPMC5pklea5zDkyh++ETEMpXU75UgN3CURKhuf/oyq7JorG/lXQaz6HBYbcT9EhPVpTzPZEczk50VAp3RWWcN6NczJJ9rVL0h+bGZmcOlJz9igNl838ziL6nxMFO9W3psXQUoBvEDo+vXPDEOUxeBrtLqUN1vfQmMw7KKiGIimInWigW19WfVQhSt47+xKKmbvBKtQ/w8lCDlwO5h7QbApv6TiaGzxtzdJMAyhNOZE7KxqvtFCJgKL4ZfmVzziLlbdbr582Cc0wxvGLDC341+CqkYVv83oimM8Ks3wHRT/ABoO1uXOSsZniUU/+oU/mzyrhrkGNNSDCwdJ0mVEWRGTYZs26IcBIeYGsLJrv3J9ZgfiyD2Knl4/yVI0IbTs7qAzhBzsXvt9aH7kH7tXYZH9QQ=
@@ -14,6 +17,6 @@ notifications:
       - https://hooks.zapier.com/hooks/catch/1711022/6zhc8p/
     on_success: always
     on_failure: always
-# after_success:
-#   - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
-#   - docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test
+after_success:
+   - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
+   - docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test
