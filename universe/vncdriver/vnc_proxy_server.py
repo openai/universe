@@ -283,7 +283,7 @@ class VNCProxyServer(protocol.Protocol, object):
         # We don't even create log directory until we've successfully
         # established the connection.
 
-        if self.enable_logging:
+        if self.enable_logging and self.factory.logfile_dir:
             # Log in vnc_recorder; don't log in playback
             self.start_logging()
             self.vnc_client.start_logging()

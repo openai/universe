@@ -64,11 +64,10 @@ class RewardProxyServer(websocket.WebSocketServerProtocol, object):
         cls._next_id += 1
         return id
 
-    def __init__(self, logfile_path='/tmp/demo/rewards.demo'):
+    def __init__(self):
         super(RewardProxyServer, self).__init__()
         self.id = self.next_id()
         self.client = None
-        self.logfile_path = logfile_path
         self.file = None  # We do not open open the file until we have established an end-to-end connection
         self.buffered = []
 
@@ -101,7 +100,9 @@ class RewardProxyServer(websocket.WebSocketServerProtocol, object):
             self.close()
             return
 
-        self.file = open(self.logfile_path, 'w')
+        logfile_path = os.path.join(self.factory.logfile_dir, 'rewards.demo')
+        logger.info('Recording to {}'.format(logfile_path))
+        self.file = open(logfile_path, 'w')
 
         self._n_open_files += 1
         logger.info("[RewardProxyServer] [%d] n open rewards files incremented: %s", self.id, self._n_open_files)
@@ -145,7 +146,8 @@ class RewardProxyServer(websocket.WebSocketServerProtocol, object):
         def _connect_callback(client):
             logger.info('[RewardProxyServer] [%d] Upstream connection %s established', self.id, remote)
             self.client = client
-            self.begin_recording()
+            if self.factory.logfile_dir:
+                self.begin_recording()
 
         def _connect_errback(reason):
             if tries < max_attempts:
