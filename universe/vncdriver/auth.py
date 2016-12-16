@@ -1,10 +1,8 @@
 import six
 import uuid
 
+from universe import utils
 from universe.vncdriver.vendor import pydes
-
-# Password is padded with nulls to 0 bytes
-PASSWORD = 'openai\0\0'
 
 class RFBDes(pydes.des):
     def setKey(self, key):
@@ -38,6 +36,9 @@ def challenge():
         buf += entropy
     return buf[:length]
 
-def challenge_response(challenge, password=PASSWORD):
+def challenge_response(challenge, password=None):
+    if password is None:
+        password = utils.default_password()
+    password += ((8 - len(password)) % 8) * '\0'  # pad to multiple of 8 bytes
     des = RFBDes(password)
     return des.encrypt(challenge)
