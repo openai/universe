@@ -46,7 +46,7 @@ register_benchmark(
 
 register_benchmark(
     id='FlashRacing-v0',
-    scorer=scoring.TotalReward(),
+    scorer=scoring.RewardPerTime(),
     name='FlashRacing',
     description='7 flash racing games, goal is best score per time',
     tasks=[
