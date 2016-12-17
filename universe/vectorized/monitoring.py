@@ -4,6 +4,7 @@ from gym import monitoring
 
 class Monitor(object):
     def __init__(self, env_n):
+        """env_n is a collection of unvectorized envs"""
         self.monitor_n = [monitoring.Monitor(env) for env in env_n]
 
     @property
@@ -40,9 +41,11 @@ class Monitor(object):
         return [monitor._before_reset() for monitor in self.monitor_n]
 
     def _after_reset(self, observation_n):
+        assert len(observation_n) == len(self.monitor_n)
         return [monitor._after_reset(observation) for monitor, observation in zip(self.monitor_n, observation_n)]
 
     def _before_step(self, action_n):
+        assert len(action_n) == len(self.monitor_n)
         return [monitor._before_step(action) for monitor, action in zip(self.monitor_n, action_n)]
 
     def _after_step(self, observation_n, reward_n, done_n, info):

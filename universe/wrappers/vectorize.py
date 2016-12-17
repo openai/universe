@@ -11,7 +11,6 @@ rather than a list of observations), turn it into a vectorized environment with 
 1.
 """
 
-    standalone = False
     metadata = {'runtime.vectorized': True}
 
     def __init__(self, env):
@@ -36,7 +35,6 @@ class Unvectorize(core.Wrapper):
 Take a vectorized environment with a batch of size 1 and turn it into an unvectorized environment.
 """ 
     autovectorize = False
-    standalone = False
     metadata = {'runtime.vectorized': False}
 
     def _configure(self, **kwargs):
@@ -57,11 +55,10 @@ Take a vectorized environment with a batch of size 1 and turn it into an unvecto
         return self.env.seed([seed])[0]
 
 class WeakUnvectorize(Unvectorize):
-    def __init__(self, env, i):
+    def __init__(self, env):
         self._env_ref = weakref.ref(env)
         super(WeakUnvectorize, self).__init__(env)
         # WeakUnvectorize won't get configure called on it
-        self.i = i
 
     @property
     def env(self):
