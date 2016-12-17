@@ -12,7 +12,7 @@ class Env(gym.Env):
         'runtime.vectorized': True,
     }
 
-    # Number of remotes. User should set this (by calling configure())
+    # Number of remotes. User should set this.
     n = None
 
     @property
