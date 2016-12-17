@@ -33,7 +33,7 @@ class Env(gym.Env):
             from universe.vectorized import monitoring
             # We need to maintain pointers to these to avoid them being
             # GC'd. They have a weak reference to us to avoid cycles.
-            self._unvectorized = [wrappers.WeakUnvectorize(self, i) for i in range(self.n)]
+            self._unvectorized = [wrappers.WeakUnvectorize(self) for _ in range(self.n)]
             # Store reference to avoid GC
             # self._render_cached = monitoring.RenderCache(self)
             self._monitor = monitoring.Monitor(self._unvectorized)
