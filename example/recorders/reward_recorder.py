@@ -13,7 +13,7 @@ logger = logging.getLogger()
 def main():
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument('-v', '--verbose', action='count', dest='verbosity', default=0, help='Set verbosity.')
-    parser.add_argument('-l', '--listen-address', default='0.0.0.0:15899', help='Address to listen on')
+    parser.add_argument('-l', '--listen-address', default='0.0.0.0:15898', help='Address to listen on')
     parser.add_argument('-s', '--rewarder-address', default='127.0.0.1:15900', help='Address of the reward server to run on.')
     parser.add_argument('-d', '--logfile-dir', default=None, help='Base directory to write logs for each connection')
     args = parser.parse_args()
