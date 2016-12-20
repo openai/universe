@@ -130,7 +130,7 @@ class RewardProxyServer(websocket.WebSocketServerProtocol, object):
                         self.id)
             return
 
-        remote = "localhost:15900"
+        remote = getattr(self.factory, 'rewarder_address', 'localhost:15900')
         endpoint = endpoints.clientFromString(reactor, 'tcp:' + remote)
         client_factory = websocket.WebSocketClientFactory('ws://' + remote)
         headers = {'authorization': self._request.headers['authorization']}
