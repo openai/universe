@@ -25,6 +25,7 @@ def main():
 
     factory = websocket.WebSocketServerFactory()
     factory.protocol = reward_proxy_server.RewardProxyServer
+    factory.rewarder_address = args.rewarder_address
     factory.logfile_dir = args.logfile_dir
     factory.setProtocolOptions(maxConnections=1)  # We only write reward logs to one place, so only allow one connection
 

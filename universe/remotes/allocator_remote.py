@@ -47,6 +47,7 @@ class AllocatorManager(threading.Thread):
     def __init__(self, client_id, base_url=allocator_base,
                  address_type=None, start_timeout=None, api_key=None,
                  runtime_id=None, tag=None, params=None, placement=None,
+                 use_recorder_ports=False,
     ):
         super(AllocatorManager, self).__init__()
         self.label = 'AllocatorManager'
@@ -68,6 +69,7 @@ class AllocatorManager(threading.Thread):
         self.start_timeout = start_timeout
         self.params = params
         self.placement = placement
+        self.use_recorder_ports = use_recorder_ports
 
 #         if base_url is None:
 #             base_url = scoreboard.api_base
@@ -102,7 +104,7 @@ class AllocatorManager(threading.Thread):
         self._sleep = 1
 
     @classmethod
-    def from_remotes(cls, client_id, remotes, runtime_id, start_timeout, tag, api_key):
+    def from_remotes(cls, client_id, remotes, runtime_id, start_timeout, tag, api_key, use_recorder_ports):
         parsed = urlparse.urlparse(remotes)
         if not (parsed.scheme == 'http' or parsed.scheme == 'https'):
             raise error.Error('AllocatorManager must start with http:// or https://: {}'.format(remotes))
@@ -122,7 +124,7 @@ class AllocatorManager(threading.Thread):
         if tag is not None: params['tag'] = tag
         if cpu is not None: params['cpu'] = cpu
 
-        return cls(client_id=client_id, runtime_id=runtime_id, base_url=base_url, start_timeout=start_timeout, params=params, placement=placement, api_key=api_key), int(n)
+        return cls(client_id=client_id, runtime_id=runtime_id, base_url=base_url, start_timeout=start_timeout, params=params, placement=placement, api_key=api_key, use_recorder_ports=use_recorder_ports), int(n)
 
     def pop(self, n=None):
         """Call from main thread. Returns the list of newly-available (handle, env) pairs."""
@@ -264,12 +266,14 @@ class AllocatorManager(threading.Thread):
                 continue
             if pop:
                 self.pending.pop(alloc_env['name'])
+            vnc_address = alloc_env['vnc_recorder_address'] if self.use_recorder_ports else alloc_env['vnc_address']
+            rewarder_address = alloc_env['rewarder_recorder_address'] if self.use_recorder_ports else alloc_env['rewarder_address']
             env = remote.Remote(
                 name=alloc_env['name'],
                 handle=alloc_env['handle'],
-                vnc_address=alloc_env['vnc_address'],
+                vnc_address=vnc_address,
                 vnc_password=alloc_env['vnc_password'],
-                rewarder_address=alloc_env['rewarder_address'],
+                rewarder_address=rewarder_address,
                 rewarder_password=alloc_env['rewarder_password'],
             )
             ready.append(env)

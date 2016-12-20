@@ -144,6 +144,7 @@ class VNCEnv(vectorized.Env):
                    rewarder_driver=None,
                    replace_on_crash=False, allocate_sync=True,
                    observer=False, api_key=None,
+                   record=False,
     ):
         """Standard Gym hook to configure the environment.
 
@@ -192,6 +193,7 @@ class VNCEnv(vectorized.Env):
             client_id=client_id,
             remotes=remotes, runtime=runtime, start_timeout=start_timeout,
             api_key=api_key,
+            use_recorder_ports=record,
         )
         self.connection_names = [None] * self.n
         self.connection_labels = [None] * self.n
