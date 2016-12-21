@@ -1490,6 +1490,14 @@ for _task in ['Learn', 'Test']:
 
 vnc_world_of_bits.append('wob.real.Duolingo-French-Basic-1-v0')
 
+vnc_world_of_bits.extend([
+    'wob.real.SignIn-ClickButton-HBO-v0',
+    'wob.real.SignIn-ClickButton-MeetUp-v0',
+    'wob.real.SignIn-ClickButton-Spotify-v0',
+    'wob.real.SignIn-ClickButton-HN-v0',
+    'wob.real.SignIn-ClickButton-Dropbox-v0',
+])
+
 for game in vnc_world_of_bits:
     register(
         id=game,
