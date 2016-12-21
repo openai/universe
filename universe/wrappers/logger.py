@@ -67,7 +67,7 @@ class Logger(vectorized.Wrapper):
         self.frames += 1
         delta = time.time() - self.last_print
         if delta > self.print_frequency:
-            fps = int(self.frames/delta)
+            fps = self.frames/delta
 
             # Displayed independently
             # action_lag = ','.join([diagnostics.display_timestamps_pair_max(action_lag) for action_lag in self.action_lag_n])
@@ -131,7 +131,7 @@ class Logger(vectorized.Wrapper):
                     ('vnc_pixels_ps[total]', '%0.1f', vnc_pixels_count),
                     ('reward_lag', '%s', reward_lag),
                     ('rewarder_message_lag', '%s', rewarder_message_lag),
-                    ('fps', '%s', fps),
+                    ('fps', '%0.2f', fps),
             ]:
                 if value == None:
                     continue
