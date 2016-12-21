@@ -9,7 +9,6 @@ except ImportError:
 import logging
 import numpy as np
 from universe import pyprofile
-from universe import error
 import struct
 
 logger = logging.getLogger(__name__)
@@ -34,21 +33,14 @@ class PseudoCursorEncoding(object):
     @classmethod
     def parse_rectangle(cls, client, x, y, width, height, data):
         split = width * height * client.framebuffer.bypp
-        image = np.frombuffer(data[:split], np.uint8).reshape((height, width, client.framebuffer.bypp))
-
-        if client.framebuffer.bypp == 4:
-            reshaped_image = image[:, :, [0, 1, 2]] # Drop alpha channel
-        elif client.framebuffer.bypp == 1:
-            reshaped_image = np.repeat(image[:,:,np.newaxis], 3, axis=2) # Convert grayscale to rgb
-        else:
-            raise error.Error("framebuffer bytes per pixel of {} is not supported".format(client.framebuffer.bypp))
+        image = np.frombuffer(data[:split], np.uint8).reshape((height, width, 4))[:, :, [0, 1, 2]]
 
         # Turn raw bytes into uint8 array
         mask = np.frombuffer(data[split:], np.uint8)
         # Turn uint8 array into bit array, and go over the scanlines
         mask = np.unpackbits(mask).reshape((height, -1 if mask.size else 0))[:, :width]
 
-        encoding = cls(reshaped_image, mask)
+        encoding = cls(image, mask)
         return Rectangle(x, y, width, height, encoding)
 
 class RAWEncoding(object):
@@ -57,15 +49,9 @@ class RAWEncoding(object):
 
     @classmethod
     def parse_rectangle(cls, client, x, y, width, height, data):
-        data = np.frombuffer(data, np.uint8).reshape((height, width, client.framebuffer.bypp))
-        if client.framebuffer.bypp == 4:
-            reshaped_data = data[:, :, [0, 1, 2]] # Drop the alpha channel
-        elif client.framebuffer.bypp == 1:
-            reshaped_data = np.repeat(data[:,:], 3, axis=2) # Convert grayscale to rgb
-        else:
-            raise error.Error("framebuffer bytes per pixel of {} is not supported".format(client.framebuffer.bypp))
-
-        encoding = cls(reshaped_data)
+        assert client.framebuffer.bpp == 32
+        data = np.frombuffer(data, np.uint8).reshape((height, width, 4))[:, :, [0, 1, 2]]
+        encoding = cls(data)
         return Rectangle(x, y, width, height, encoding)
 
 class ZlibEncoding(object):
