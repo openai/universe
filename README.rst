@@ -218,7 +218,7 @@ IP address of your Docker daemon, and use ``openai`` as the password.)
 Breaking down the example
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-So we managed to run an agent, but what did all the code actually
+So we managed to run an agent, what did all the code actually
 mean? We'll go line-by-line through the example.
 
 * First, we import the `gym <https://github.com/openai/gym>`__ library,
