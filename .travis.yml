@@ -19,4 +19,4 @@ notifications:
 after_success:
   - docker login quay.io -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
-  - docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test
+  - ( while true; do echo '.'; sleep 60; done ) & docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test. We echo in order to keep travis alive during a slow push
