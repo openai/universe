@@ -34,7 +34,7 @@ class RewarderSession(object):
 
         self.clients = {}
 
-    def close(self, name=None, reason='closed by RewarderSession.close'):
+    def close(self, name=None, reason=u'closed by RewarderSession.close'):
         if name is None:
             names = list(self.names_by_id.values())
         else:
