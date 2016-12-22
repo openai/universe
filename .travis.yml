@@ -18,5 +18,5 @@ notifications:
     on_failure: always
 after_success:
   - docker login quay.io -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-   - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
-   - docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test
+  - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
+  - docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test
