@@ -1140,7 +1140,6 @@ for game in [
     'flashgames.ShamelessClone2-v0',
     'flashgames.Sheepster-v0',
     'flashgames.Sheepy-v0',
-    'flashgames.Shift-v0',
     'flashgames.ShimmyChute-v0',
     'flashgames.ShootTheCircle-v0',
     'flashgames.ShortCircuit-v0',
