@@ -9,7 +9,7 @@ register(
     entry_point='universe.envs:DummyVNCEnv',
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit.max_episode_seconds': 0.1
+        'wrapper_config.TimeLimit.max_episode_seconds': 0.01
         }
     )
 
@@ -54,7 +54,7 @@ def test_seconds_limit_restart():
     env = wrappers.TimeLimit(env)
     env.configure(_n=1)
 
-    assert env.max_episode_seconds == 0.1
+    assert env.max_episode_seconds == 0.01
     assert env.max_episode_steps == None
 
     # Episode has started
@@ -65,7 +65,7 @@ def test_seconds_limit_restart():
     _, _, done, info = env.step([[]])
     assert done == [False]
 
-    time.sleep(0.2)
+    time.sleep(0.02)
 
     # Limit reached, now we get a done signal and the env resets itself
     _, _, done, info = env.step([[]])
@@ -79,4 +79,3 @@ def test_default_time_limit():
 
     assert env.max_episode_seconds == wrappers.time_limit.DEFAULT_MAX_EPISODE_SECONDS
     assert env.max_episode_steps == None
-
