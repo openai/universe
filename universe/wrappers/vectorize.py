@@ -55,10 +55,14 @@ Take a vectorized environment with a batch of size 1 and turn it into an unvecto
         return self.env.seed([seed])[0]
 
 class WeakUnvectorize(Unvectorize):
-    def __init__(self, env):
+    def __init__(self, env, i):
         self._env_ref = weakref.ref(env)
         super(WeakUnvectorize, self).__init__(env)
         # WeakUnvectorize won't get configure called on it
+        self.i = i
+
+    def _check_for_duplicate_wrappers(self):
+        pass  # Disable this check because we need to wrap vectorized envs in multiple unvectorize wrappers
 
     @property
     def env(self):

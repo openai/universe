@@ -15,6 +15,7 @@ from universe.wrappers.timer import Timer
 from universe.wrappers.vectorize import Vectorize, Unvectorize, WeakUnvectorize
 from universe.wrappers.vision import Vision
 from universe.wrappers.recording import Recording
+from universe.wrappers.monitoring import Monitor
 
 def wrap(env):
     return Timer(Render(Throttle(env)))

@@ -8,8 +8,8 @@ from universe import wrappers
 def test_multiprocessing_env_monitoring():
     with helpers.tempdir() as temp:
         env = wrappers.WrappedMultiprocessingEnv('Pong-v3')
+        env = wrappers.Monitor(temp)(env)
         env.configure(n=2)
-        env.monitor.start(temp)
         env.reset()
         for i in range(2):
             env.step([0, 0])
@@ -24,13 +24,17 @@ def test_vnc_monitoring():
     with helpers.tempdir() as temp:
         env = gym.make('gym-core.Pong-v3')
         env = wrappers.GymCoreAction(env)
+        env = wrappers.Monitor(temp)(env)
+
         env.configure(remotes=2)
-        env.monitor.start(temp, seed_n=[1, 2])
         env.reset()
         for i in range(2):
             env.step([0, 0])
-        env.monitor.close()
         env.close()
 
         results = gym.monitoring.load_results(temp)
         assert results['env_info']['env_id'] == 'gym-core.Pong-v3'
+
+if __name__ == '__main__':
+    test_multiprocessing_env_monitoring()
+    test_vnc_monitoring()

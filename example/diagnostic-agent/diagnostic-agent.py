@@ -1,20 +1,17 @@
 #!/usr/bin/env python
 import argparse
 import logging
-import numpy as np
-import os
-import six
-import sys
-import threading
 import time
-import traceback
 
 import gym
+import numpy as np
 import universe
 from universe import pyprofile, wrappers, spaces
+from gym import wrappers as gym_wrappers
 
 # if not os.getenv("PYPROFILE_FREQUENCY"):
 #     pyprofile.profile.print_frequency = 5
+from universe import vectorized
 
 logger = logging.getLogger()
 
@@ -102,6 +99,9 @@ if __name__ == '__main__':
         env.seed([0])
     env = wrappers.Logger(env)
 
+    if args.monitor:
+        env = wrappers.Monitor('/tmp/vnc_random_agent', force=True)(env)
+
     env.configure(
         fps=args.fps,
         # print_frequency=None,
@@ -119,10 +119,6 @@ if __name__ == '__main__':
             'encoding': 'tight', 'compress_level': 0, 'fine_quality_level': 50, 'subsample_level': 0, 'quality_level': 5,
         },
     )
-
-    if args.monitor:
-        env.monitor.start('/tmp/vnc_random_agent', force=True, video_callable=lambda i: True)
-
     if args.actions == 'random':
         action_space = env.action_space
     elif args.actions == 'noop':
