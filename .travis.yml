@@ -17,6 +17,8 @@ notifications:
     on_success: always
     on_failure: always
 after_success:
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
   - docker login quay.io -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker tag quay.io/openai/universe:test quay.io/openai/universe-travis:passed-ci
-  - ( while true; do echo '.'; sleep 60; done ) & docker push quay.io/openai/universe-travis:passed-ci  # This repo is used by universe-envs to run integration test. We echo in order to keep travis alive during a slow push
+  - if [ "$BRANCH" == "master" ]; then ( while true; do echo '.'; sleep 60; done ) & docker push quay.io/openai/universe-travis:passed-ci; fi # This repo is used by universe-envs to run integration test. We echo in order to keep travis alive during a slow push
