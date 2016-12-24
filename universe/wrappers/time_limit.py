@@ -18,9 +18,4 @@ class TimeLimit(vectorized.Wrapper):
 
     def _step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
-        # We want this to be above Mask, so we know whether or not a
-        # particular index is resetting.
-        if self.diagnostics:
-            with pyprofile.push('vnc_env.diagnostics.add_metadata'):
-                self.diagnostics.add_metadata(observation_n, info['n'])
         return observation_n, reward_n, done_n, info
