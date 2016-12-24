@@ -13,7 +13,7 @@ class TimeLimit(vectorized.Wrapper):
         self.max_episode_seconds = self.env.spec.tags.get('wrapper_config.TimeLimit.max_episode_seconds', None)
         self.max_episode_steps = self.env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps', None)
 
-        if self.max_episode_steps is None and self.max_episode_steps is None:
+        if self.max_episode_seconds is None and self.max_episode_steps is None:
             self.max_episode_seconds = DEFAULT_MAX_EPISODE_SECONDS
 
     def _step(self, action_n):

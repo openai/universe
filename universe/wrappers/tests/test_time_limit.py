@@ -55,7 +55,7 @@ def test_seconds_limit_restart():
     env.configure(_n=1)
 
     assert env.max_episode_seconds == 0.1
-    assert env.max_episode_seconds == None
+    assert env.max_episode_steps == None
 
     # Episode has started
     _, _, done, info = env.step([[]])
