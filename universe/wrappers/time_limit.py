@@ -42,10 +42,10 @@ class TimeLimit(vectorized.Wrapper):
             self._episode_started_at = time.time()
 
         if self._past_limit():
-            observation_n = self.env.reset()  # Force a reset
-            return observation_n, reward_n, [True] * self.n, info  # Return the new observation and done = True
-        else:
-            return observation_n, reward_n, done_n, info
+            _ = self.env.reset()  # Force a reset, discard the observation
+            done_n = [True] * self.n  # Force a done = True
+
+        return observation_n, reward_n, done_n, info
 
     def _reset(self):
         self._episode_started_at = time.time()
