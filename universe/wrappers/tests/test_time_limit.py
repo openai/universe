@@ -9,7 +9,7 @@ register(
     entry_point='universe.envs:DummyVNCEnv',
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit.max_episode_seconds': 0.01
+        'wrapper_config.TimeLimit._max_episode_seconds': 0.01
         }
     )
 
@@ -18,7 +18,7 @@ register(
     entry_point='universe.envs:DummyVNCEnv',
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit.max_episode_steps': 1
+        'wrapper_config.TimeLimit._max_episode_steps': 1
         }
     )
 
@@ -29,8 +29,8 @@ def test_steps_limit_restart():
     env.configure(_n=1)
     env.reset()
 
-    assert env.max_episode_seconds == None
-    assert env.max_episode_steps == 1
+    assert env._max_episode_seconds == None
+    assert env._max_episode_steps == 1
 
     # Episode has started
     _, _, done, info = env.step([[]])
@@ -58,8 +58,8 @@ def test_seconds_limit_restart():
     env.configure(_n=1)
     env.reset()
 
-    assert env.max_episode_seconds == 0.01
-    assert env.max_episode_steps == None
+    assert env._max_episode_seconds == 0.01
+    assert env._max_episode_steps == None
 
     # Episode has started
     _, _, done, info = env.step([[]])
@@ -82,5 +82,5 @@ def test_default_time_limit():
     env.configure(_n=1)
     env.reset()
 
-    assert env.max_episode_seconds == wrappers.time_limit.DEFAULT_MAX_EPISODE_SECONDS
-    assert env.max_episode_steps == None
+    assert env._max_episode_seconds == wrappers.time_limit.DEFAULT_MAX_EPISODE_SECONDS
+    assert env._max_episode_steps == None
