@@ -110,14 +110,13 @@ register(
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
+        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'rewarder_observation': True,
         'gym_core_id': 'CartPole-v0',
 },
-    # experience_limit=1000,
     trials=2,
-    timestep_limit=500,
 )
 
 # Dynamics should match CartPole-v0, but have pixel observations
@@ -128,13 +127,12 @@ register(
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
+        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'gym_core_id': 'CartPole-v0',
     },
-    # experience_limit=1000,
     trials=2,
-    timestep_limit=500,
 )
 
 # Async cartpole with 4-d observations
@@ -145,14 +143,13 @@ register(
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
+        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'rewarder_observation': True,
         'gym_core_id': 'CartPole-v0',
     },
-    # experience_limit=1000,
     trials=2,
-    timestep_limit=500,
 )
 
 register(
@@ -162,13 +159,12 @@ register(
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
+        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'gym_core_id': 'CartPole-v0',
     },
-    # experience_limit=1000,
     trials=2,
-    timestep_limit=500,
 )
 
 # gym-core.Atari
@@ -197,13 +193,12 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': gym_core_id,
             },
-            # experience_limit=1000,
-            timestep_limit=100000,
         )
 
         register(
@@ -213,13 +208,12 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': gym_core_id,
             },
-            # experience_limit=1000,
-            timestep_limit=100000,
         )
 
         register(
@@ -229,14 +223,13 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': gym_core_id,
                 'fps': 30,
             },
-            # experience_limit=1000,
-            timestep_limit=100000,
         )
 
         register(
@@ -246,14 +239,13 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': gym_core_id,
                 'fps': 15,
             },
-            # experience_limit=1000,
-            timestep_limit=100000,
         )
 
         deterministic_gym_core_id = '{}Deterministic-v{}'.format(base, version) # e.g. SpaceInvadersDeterministic-v3
@@ -265,12 +257,12 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': deterministic_gym_core_id,
             },
-            timestep_limit=100000,
         )
         register(
             id='gym-core.{}DeterministicSlow-v{}'.format(base, version),
@@ -279,13 +271,13 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 75000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': deterministic_gym_core_id,
                 'fps': 15,
             },
-            timestep_limit=75000,
         )
         register(
             id='gym-core.{}DeterministicSync-v{}'.format(base, version),
@@ -294,13 +286,12 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 75000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': deterministic_gym_core_id,
             },
-            # experience_limit=1000,
-            timestep_limit=75000,
         )
 
         no_frameskip_gym_core_id = '{}NoFrameskip-v{}'.format(base, version) # e.g. SpaceInvadersNoFrameskip-v3
@@ -311,13 +302,12 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 400000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
                 'gym_core_id': no_frameskip_gym_core_id,
             },
-            # experience_limit=1000,
-            timestep_limit=400000
         )
 
 #------------------------ Flash game environments ------------------------#
@@ -1377,13 +1367,13 @@ for game in [
             'vnc': True,
             'flashgames': True,
             'runtime': 'flashgames',
+            'wrapper_config.TimeLimit.max_episode_steps': 20000,
             'metadata_encoding': metadata_v1,
             'action_probe': {
                 'type': 'key',
                 'value': 0x60,
             }
         },
-        timestep_limit=20000,
     )
 
 register(
@@ -1393,8 +1383,8 @@ register(
         'vnc': True,
         'flashgames': True,
         'runtime': 'flashgames',
+        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
     },
-    timestep_limit=10**7,
 )
 
 #------------------------ World of Bits and MiniWoB ------------------------#
@@ -1511,9 +1501,9 @@ for game in vnc_world_of_bits:
         tags={
             'vnc': True,
             'wob': True,
-            'runtime': 'world-of-bits'
+            'runtime': 'world-of-bits',
+            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
-        timestep_limit=10**7,
     )
 
 #-------------------------- Complex Games ------------------------#
@@ -1533,8 +1523,8 @@ for id in ['starcraft.TerranAstralBalance-v0']:
             'vnc': True,
             'starcraft': True,
             'runtime': 'starcraft',
+            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
-        timestep_limit=10**7,
     )
 
 for gtav_game in ['gtav.SaneDriving-v0', 'gtav.Speed-v0']:
@@ -1545,8 +1535,8 @@ for gtav_game in ['gtav.SaneDriving-v0', 'gtav.Speed-v0']:
             'vnc': True,
             'gtav': True,
             'runtime': 'vnc-windows',
+            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
-        timestep_limit=10**7,
     )
 
 register(
@@ -1556,8 +1546,8 @@ register(
         'vnc': True,
         'wog': True,
         'runtime': 'vnc-world-of-goo',
+        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
     },
-    timestep_limit=10**7,
 )
 
 for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
@@ -1568,6 +1558,7 @@ for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
             'vnc': True,
             'internet': True,
             'slither': True,
+            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
             'runtime': 'flashgames',
             'metadata_encoding': metadata_v1,
             'action_probe': {
@@ -1575,7 +1566,6 @@ for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
                 'value': 0x60,
             }
         },
-        timestep_limit=10**7,
     )
 
 register(
@@ -1584,10 +1574,10 @@ register(
     tags={
         'vnc': True,
         'metadata_encoding': metadata_v1,
+        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         'action_probe': {
             'type': 'key',
             'value': 0x60,
-        }
-    },
-    timestep_limit=10**7
+            }
+        },
     )
