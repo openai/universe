@@ -9,7 +9,7 @@ register(
     entry_point='universe.envs:DummyVNCEnv',
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit._max_episode_seconds': 0.01
+        'wrapper_config.TimeLimit.max_episode_seconds': 0.01
         }
     )
 
@@ -18,7 +18,7 @@ register(
     entry_point='universe.envs:DummyVNCEnv',
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit._max_episode_steps': 1
+        'wrapper_config.TimeLimit.max_episode_steps': 2
         }
     )
 
@@ -30,7 +30,7 @@ def test_steps_limit_restart():
     env.reset()
 
     assert env._max_episode_seconds == None
-    assert env._max_episode_steps == 1
+    assert env._max_episode_steps == 2
 
     # Episode has started
     _, _, done, info = env.step([[]])
@@ -77,7 +77,16 @@ def test_seconds_limit_restart():
 
 
 def test_default_time_limit():
-    env = gym.make('test.DummyVNCEnv-v0')
+    # We need an env without a default limit
+    register(
+        id='test.NoLimitDummyVNCEnv-v0',
+        entry_point='universe.envs:DummyVNCEnv',
+        tags={
+            'vnc': True,
+            },
+    )
+
+    env = gym.make('test.NoLimitDummyVNCEnv-v0')
     env = wrappers.TimeLimit(env)
     env.configure(_n=1)
     env.reset()
