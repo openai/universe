@@ -27,9 +27,11 @@ class TimeLimit(vectorized.Wrapper):
     def _past_limit(self):
         """Return true if we are past our limit"""
         if self.max_episode_steps is not None and self.max_episode_steps < self._elapsed_steps:
+            logger.debug("Env has passed the step limit defined by TimeLimit.")
             return True
 
         if self.max_episode_seconds is not None and self.max_episode_seconds < self._elapsed_seconds:
+            logger.debug("Env has passed the seconds limit defined by TimeLimit.")
             return True
 
         return False
