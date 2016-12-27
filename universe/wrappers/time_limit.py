@@ -35,14 +35,12 @@ class TimeLimit(vectorized.Wrapper):
         return False
 
     def _step(self, action_n):
+        assert self._episode_started_at is not None, "Cannot call env.step() before calling reset()"
         observation_n, reward_n, done_n, info = self.env.step(action_n)
-
         self._elapsed_steps += 1
-        if self._episode_started_at is None:
-            self._episode_started_at = time.time()
 
         if self._past_limit():
-            _ = self.env.reset()  # Force a reset, discard the observation
+            _ = self.reset()  # Force a reset, discard the observation
             done_n = [True] * self.n  # Force a done = True
 
         return observation_n, reward_n, done_n, info
