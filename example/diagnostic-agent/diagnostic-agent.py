@@ -73,6 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--fps', default=60., type=float, help='Desired frames per second')
     parser.add_argument('-N', '--max-steps', type=int, default=10**7, help='Maximum number of steps to take')
     parser.add_argument('-E', '--max-episodes', type=int, default=10**7, help='Maximum number of episodes')
+    parser.add_argument('-T', '--start-timeout', type=int, default=None, help='Rewarder session connection timeout (seconds)')
     args = parser.parse_args()
 
     logging.getLogger('gym').setLevel(logging.NOTSET)
@@ -108,6 +109,7 @@ if __name__ == '__main__':
         # ignore_clock_skew=True,
         remotes=args.remote,
         client_id=args.client_id,
+        start_timeout=args.start_timeout,
 
         # remotes=remote, docker_image=args.docker_image, reuse=args.reuse, ignore_clock_skew=True,
         # vnc_session_driver='go', vnc_session_kwargs={
