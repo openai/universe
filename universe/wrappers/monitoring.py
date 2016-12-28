@@ -18,10 +18,8 @@ class _Monitor(core.Wrapper):
         self.uid = uid
         self.mode = mode
 
-    def _configure(self, **kwargs):
-        super(_Monitor, self)._configure(**kwargs)
-
-        # We have to wait until configure to set the monitor because we need the number of instances in a vectorized env
+        # TODO if we want to monitor more than one instance in a vectorized
+        # env we'll have to do this after configure()
         self._start_monitor()
 
     def _start_monitor(self):
@@ -29,7 +27,9 @@ class _Monitor(core.Wrapper):
         from universe import wrappers
         # We need to maintain pointers to these to avoid them being
         # GC'd. They have a weak reference to us to avoid cycles.
-        self._unvectorized_envs = [wrappers.WeakUnvectorize(self, i) for i in range(self.n)]
+        # TODO if we want to monitor more than one instance in a vectorized
+        # env we'll need to actually fix WeakUnvectorize
+        self._unvectorized_envs = [wrappers.WeakUnvectorize(self, i) for i in range(1)]
 
         # For now we only monitor the first env
         self._monitor = monitoring.MonitorManager(self._unvectorized_envs[0])
