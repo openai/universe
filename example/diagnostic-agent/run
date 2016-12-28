@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+ENV_ID="flashgames.NeonRace-v0"
+CPU_QUOTAS="4 3 2 1.5 1 0.75 0.5"
+LOGDIR_BASE="/mnt/efs/cpu_env_tests/$ENV_ID/$(date +%s)"
+
+for cpu_quota in $CPU_QUOTAS
+do
+    logdir=$LOGDIR_BASE/$cpu_quota
+    echo mkdir -p $logdir
+    mkdir -p $logdir
+    ./make-podspec.py $ENV_ID $cpu_quota $logdir > $logdir/pod.yaml
+    kubectl create -f $logdir/pod.yaml
+done

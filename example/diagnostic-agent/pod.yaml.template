@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: cputest-__CPU_QUOTA__-
+spec:
+  containers:
+  - name: agent
+    image: docker.openai.com/diagnostic-agent
+    command: ["/bin/bash", "-ce", "
+        python /diagnostic-agent.py -e __ENV_ID__ -A forward -r vnc://localhost:5899+15899 -R -E 1 ;
+        echo -n | nc localhost 9999
+    "]
+    resources:
+      requests:
+        cpu: 2
+  - name: env
+    image: docker.openai.com/universe.flashgames
+    command: ["/bin/bash", "-ce", "
+        /app/universe-envs/flashgames/init run &
+        python -c 'import socket; s = socket.socket(); s.bind((\"localhost\", 9999)); s.listen(1); s.accept()[0].close()' # don't have netcat
+    "]
+    env:
+      - name: RECORDER_LOGDIR
+        value: __RECORDER_LOGDIR__
+      - name: VNC_ENCODINGS_NO_ADD_PSEUDO_CURSOR_ENCODING
+        value: "true"
+    securityContext:
+      privileged: true
+      capabilities:
+        add: ["NET_ADMIN", "SYS_ADMIN"]
+    volumeMounts:
+    - name: efs
+      mountPath: /mnt/efs
+    resources:
+      limits:
+        cpu: __CPU_QUOTA__
+  volumes:
+  - name: efs
+    hostPath:
+      path: /mnt/efs
+  hostIPC: true
+  restartPolicy: OnFailure
+  nodeSelector:
+    aws/type: c4.8xlarge
