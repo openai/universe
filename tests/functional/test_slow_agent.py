@@ -2,6 +2,7 @@ import logging
 import os, time, re
 import pytest
 import numpy as np
+import six
 from six.moves import queue
 import gym, universe
 from universe import wrappers, spaces
@@ -104,7 +105,7 @@ def run_slow_agent(agent_think_time):
 
     return reaction_time_samples, fps_samples, tot_reward, dup_obs_count, errors
 
-
+@pytest.mark.skipif(six.PY2, reason='No logging.handlers.QueueHandler in py2')
 def test_slow_agent():
     """
     Tests an agent that runs slow -- we ask for 10 fps from the env, but then take more than 100 mS to think
@@ -140,6 +141,7 @@ def test_slow_agent():
 
 
 
+@pytest.mark.skipif(six.PY2, reason='No logging.handlers.QueueHandler in py2')
 def test_fast_agent():
     """
     Tests an agent that runs fast -- we ask for 10 fps from the env and should get it.
