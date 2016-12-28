@@ -2,7 +2,7 @@ import logging
 import os, time, re
 import pytest
 import numpy as np
-import queue
+from six.moves import queue
 import gym, universe
 from universe import wrappers, spaces
 from universe.vncdriver import constants
