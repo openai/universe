@@ -100,7 +100,7 @@ if __name__ == '__main__':
     env = wrappers.Logger(env)
 
     if args.monitor:
-        env = wrappers.Monitor('/tmp/vnc_random_agent', force=True)(env)
+        env = wrappers.Monitor(env, '/tmp/vnc_random_agent', force=True)
 
     env.configure(
         fps=args.fps,
