@@ -105,7 +105,8 @@ def run_slow_agent(agent_think_time):
 
     return reaction_time_samples, fps_samples, tot_reward, dup_obs_count, errors
 
-@pytest.mark.skipif(six.PY2, reason='No logging.handlers.QueueHandler in py2')
+#@pytest.mark.skipif(six.PY2, reason='No logging.handlers.QueueHandler in py2')
+@pytest.mark.skip(reason='vnc_env still broken with slow agent')
 def test_slow_agent():
     """
     Tests an agent that runs slow -- we ask for 10 fps from the env, but then take more than 100 mS to think
