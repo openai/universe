@@ -1,14 +1,15 @@
 import logging
 
 import time
-from universe import pyprofile, vectorized
+from universe import pyprofile
+from universe.vectorized import core
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_MAX_EPISODE_SECONDS = 20 * 60.  # Default to 20 minutes if there is no explicit limit
 
 
-class TimeLimit(vectorized.Wrapper):
+class TimeLimit(core.Wrapper):
     def _configure(self, **kwargs):
         super(TimeLimit, self)._configure(**kwargs)
         self._max_episode_seconds = self.env.spec.tags.get('wrapper_config.TimeLimit.max_episode_seconds', None)
