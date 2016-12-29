@@ -23,6 +23,8 @@ class _Monitor(core.Wrapper):
         self._start_monitor()
 
     def _start_monitor(self):
+        logger.info("Starting Monitor. Writing monitor logs to {}".format(self.directory))
+
         # Circular dependencies :(
         from universe import wrappers
         # We need to maintain pointers to these to avoid them being
