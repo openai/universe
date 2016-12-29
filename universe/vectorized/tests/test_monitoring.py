@@ -35,6 +35,24 @@ def test_vnc_monitoring():
         results = gym.monitoring.load_results(temp)
         assert results['env_info']['env_id'] == 'gym-core.Pong-v3'
 
+def test_monitored_observation_dimensions():
+    with helpers.tempdir() as temp:
+        env = gym.make('test.DummyVNCEnv-v0')
+        env.configure(_n=1)
+
+        env.reset()
+        obs1, _, _, _ = env.step([[]])
+        env.close()
+
+        env = gym.make('test.DummyVNCEnv-v0')
+        env = wrappers.Monitor(env, temp)
+        env.configure(_n=1)
+
+        env.reset()
+        obs2, _, _, _ = env.step([[]])
+        env.close()
+
+        assert obs1[0]['visual'].shape == obs2[0]['visual'].shape, "Expected shapes to be equal with and without monitoring {} {}".format(obs1[0]['visual'].shape, obs2[0]['visual'].shape)
+
 if __name__ == '__main__':
-    test_multiprocessing_env_monitoring()
-    test_vnc_monitoring()
+    test_monitored_observation_dimensions()
