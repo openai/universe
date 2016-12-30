@@ -126,6 +126,14 @@ class RewarderSession(object):
         factory.arg_fps = fps
 
         def record_error(e):
+            # TODO add extra_logger here
+            import traceback
+            print("JTJT")
+            print("JTJT")
+            print("JTJT")
+            print(e)
+            traceback.print_stack()
+
             if isinstance(e, failure.Failure):
                 e = e.value
 
