@@ -1,6 +1,6 @@
 flashgames:
   tag: 0.20.15
 gym-core:
-  tag: 0.20.0
+  tag: 0.20.1-dev2
 world-of-bits:
   tag: 0.20.0
