@@ -24,6 +24,12 @@ from universe.remotes import docker_remote
 from universe.rewarder import merge_infos
 from universe.runtimes.registration import runtime_spec
 
+__all__ = [
+    'configuration', 'envs', 'error', 'kube', 'pyprofile', 'remotes', 'rewarder', 'runtimes',
+    'scoreboard', 'spaces', 'twisty', 'utils', 'vectorized', 'vncdriver', 'wrappers',
+    'configure_logging', 'docker_image', 'enable_logfile',
+    'logger', 'extra_logger']
+
 def docker_image(runtime_id):
     logger.warn('DEPRECATION WARNING: universe.docker_image(runtime_id) is deprecated and will be removed soon. Use runtime_spec(runtime_id).image instead. ')
     return runtime_spec(runtime_id).image
