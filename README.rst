@@ -357,3 +357,13 @@ What's next?
 * For more information on how to manage remotes, see the separate documentation page on `remotes <doc/remotes.rst>`__.
 
 * Sign up for a `beta <https://docs.google.com/forms/d/e/1FAIpQLScAiW-kIS0mz6hdzzFZJJFlXlicDvQs1TX9XMEkipNwjV5VlA/viewform>`_ to get early access to upcoming Universe releases, such as tools to integrate new Universe environments or a dataset of recorded human demonstrations.
+
+
+Changelog
+---------
+
+- 2016-12-27: BACKWARDS INCOMPATIBILITY: The gym monitor is now a
+  wrapper. Rather than starting monitoring as
+  `env.monitor.start(directory)`, envs are now wrapped as follows:
+  `env = wrappers.Monitor(env, directory)`. This change is on master
+  and will be released with 0.21.0.
