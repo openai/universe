@@ -7,6 +7,7 @@ import pipes
 import sys
 import threading
 import uuid
+import time, random
 
 import docker
 import six.moves.urllib.parse as urlparse
@@ -147,6 +148,7 @@ class PortAssigner(object):
         self.reuse = reuse
         self.instance_id = 'universe-' + random_alphanumeric(length=6)
         self.client, self.info = get_client()
+        self._next_port = 5900
         self._refresh_ports()
 
     def _refresh_ports(self):
@@ -156,8 +158,8 @@ class PortAssigner(object):
                 # {u'IP': u'0.0.0.0', u'Type': u'tcp', u'PublicPort': 5000, u'PrivatePort': 500}
                 if port['Type'] == 'tcp' and 'PublicPort' in port:
                     ports[port['PublicPort']] = container['Id']
+        logger.info('Ports used: %s', ports.keys())
         self._ports = ports
-        self._next_port = 5900
 
     def allocate_ports(self, num):
         if self.reuse and self._next_port in self._ports:
@@ -213,7 +215,7 @@ class DockerInstance(object):
             # If we're reusing, we don't scan through ports for a free
             # one.
             if not self.assigner.reuse:
-                attempts = 5
+                attempts = 20
             else:
                 attempts = 1
 
@@ -222,6 +224,10 @@ class DockerInstance(object):
             e = self._start()
             if e is None:
                 return
+
+            time.sleep(random.uniform(1.0, 5.0))
+            self.assigner._refresh_ports()
+
         raise error.Error('[{}] Could not start container after {} attempts. Last error: {}'.format(self.label, attempts, e))
 
     def _spawn(self):
@@ -249,7 +255,18 @@ class DockerInstance(object):
 
             logger.info('Image %s not present locally; pulling', self.runtime.image)
             self._pull_image()
-            # Try spawning again
+            # If we called pull_image from multiple processes (as we do with universe-starter-agent A3C)
+            # these will all return at the same time. We probably all got the same port numbers before the pull started,
+            # so wait a short random time and refresh our port numbers
+            time.sleep(random.uniform(0.5, 2.5))
+            self.assigner._refresh_ports()
+            self.vnc_port, self.rewarder_port, self._container_id = self.assigner.allocate_ports(2)
+            if self._container_id is not None:
+                logger.info('[%s] Reusing container %s on ports %s and %s', self.label, self._container_id[:12], self.vnc_port, self.rewarder_port)
+                self.reusing = True
+                self.started = True
+                return
+            # Try spawning again.
             container = self._spawn_container()
 
         self._container_id = container['Id']
@@ -306,8 +323,25 @@ class DockerInstance(object):
         return None
 
     def _remove(self):
-        logger.info("Killing and removing container: id=%s. (If this command errors, you can always kill all automanaged environments on this Docker daemon via: docker rm -f $(docker ps -q -a -f 'label=com.openai.automanaged=true')", self._container_id)
-        self.client.remove_container(container=self._container_id, force=True)
+        logger.info("Killing and removing container: id=%s", self._container_id)
+        try:
+            self.client.remove_container(container=self._container_id, force=True)
+        except docker.errors.APIError as e:
+            # This seems to happen occasionally when we try to delete a container immediately after creating it.
+            # But although we get an error trying to remove it, it usually goes away shortly
+            # A typical error message is
+            #   Driver aufs failed to remove root filesystem 0015803583d91741d25fce28ae0ef540b436853d1c90061caacaef97e3682403: \
+            #   rename /var/lib/docker/aufs/mnt/69a72854511f1fbb9d7cb0ef0ce0787e573af0887c1213ba3a0c3a0cfd71efd2 \
+            #   /var/lib/docker/aufs/mnt/69a72854511f1fbb9d7cb0ef0ce0787e573af0887c1213ba3a0c3a0cfd71efd2-removing: \
+            #   device or resource busy
+            # Just proceed as if it had gone away
+            if 'device or resource busy' in str(e.explanation):
+                logger.info("[%s] Could not remove container: %s. You can always kill all automanaged environments on this Docker daemon via: docker rm -f $(docker ps -q -a -f 'label=com.openai.automanaged=true')", self.label, e)
+                self._container_id = None
+                return e
+            else:
+                raise
+
         self._container_id = None
 
     def __del__(self):
