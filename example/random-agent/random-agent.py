@@ -22,6 +22,8 @@ def main():
 
 
     env = gym.make('flashgames.NeonRace-v0')
+    env.configure(remotes=1)  # automatically creates a local docker container
+    
     # Restrict the valid random actions. (Try removing this and see
     # what happens when the agent is given full control of the
     # keyboard/mouse.)
