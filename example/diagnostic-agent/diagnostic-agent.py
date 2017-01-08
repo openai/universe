@@ -94,7 +94,7 @@ if __name__ == '__main__':
         # translator. Everything else probably wants a SafeActionSpace
         # wrapper to shield them from random-agent clicking around
         # everywhere.
-        env = wrappers.SafeActionSpace(env)
+        env = wrappers.experimental.SafeActionSpace(env)
     else:
         # Only gym-core are seedable
         env.seed([0])

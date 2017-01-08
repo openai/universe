@@ -361,7 +361,7 @@ What's next?
 
 Changelog
 ---------
-
+- 2017-01-08: The wrappers.SafeActionSpace has been moved to wrappers.experimental.SafeActionSpace. The old location will remain with a deprecation warning until 2017-02-08.
 - 2016-12-27: BACKWARDS INCOMPATIBILITY: The gym monitor is now a
   wrapper. Rather than starting monitoring as
   `env.monitor.start(directory)`, envs are now wrapped as follows:

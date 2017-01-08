@@ -27,7 +27,7 @@ def main():
     # Restrict the valid random actions. (Try removing this and see
     # what happens when the agent is given full control of the
     # keyboard/mouse.)
-    env = wrappers.SafeActionSpace(env)
+    env = wrappers.experimental.SafeActionSpace(env)
     observation_n = env.reset()
 
     while True:
