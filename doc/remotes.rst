@@ -105,6 +105,29 @@ just plug in the appropriate URL or IP address:
 
     env.configure(remotes='vnc://your.host.here:5900+15900')
 
+VNC compression settings
+-----------------------------------------------
+
+The VNC connection supports multiple compression settings that control the tradeoff
+between a fast but highly compressed, low quality data stream and slow, uncompressed 
+data stream. These can be configured by using the ``vnc_kwargs`` argument to 
+``env.configure``. The default arguments are:
+
+.. code:: python
+
+    env.configure(vnc_kwargs={'encoding':'tight', 'fine_quality_level':50, 'subsample_level':2})
+
+Here, ``tight`` is a lossy encoding that uses JPEG for compression. We also support ``zrle`` instead, which is lossless.
+The ``fine_quality_level`` controls the compression strength from high compression / low quality (0) to low compression / high quality (100). 
+For ``subsample_level``, 0 is highest quality, 2 is low quality and 3 is greyscale. You can investigate the effects
+of many of these options on the visual fidelity by connecting to an environment using TurboVNC, which allows you to 
+tune these settings in the user interface.
+
+Note that the codecs always operate on deltas of the screen, so if large portions of your screen are not changing then 
+you might be able to afford higher quality settings. Conversely, if you're playing a racing game that takes up a large
+portion of the screen you should be more worried about bandwidth. The call to ``step`` is asynchronous with respect to
+new frames arriving, so if the connection is too slow the environments will lag.
+
 Automatic cloud-hosted remotes: starter cluster
 -----------------------------------------------
 
