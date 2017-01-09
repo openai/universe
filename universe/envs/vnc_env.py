@@ -137,7 +137,7 @@ class VNCEnv(vectorized.Env):
                    client_id=None,
                    start_timeout=None, docker_image=None,
                    ignore_clock_skew=False, disable_action_probes=False,
-                   vnc_driver=None, vnc_kwargs={},
+                   vnc_driver=None, vnc_kwargs=None,
                    rewarder_driver=None,
                    replace_on_crash=False, allocate_sync=True,
                    observer=False, api_key=None,
@@ -185,6 +185,9 @@ class VNCEnv(vectorized.Env):
 
         if client_id is None:
             client_id = default_client_id()
+
+        if vnc_kwargs is None:
+            vnc_kwargs = {}
 
         self.remote_manager, self.n = remotes_module.build(
             client_id=client_id,
