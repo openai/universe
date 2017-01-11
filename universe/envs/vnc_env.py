@@ -250,7 +250,7 @@ class VNCEnv(vectorized.Env):
             self._handle_connect()
 
     def connect(self, i, name, vnc_address, rewarder_address, vnc_password=None, rewarder_password=None):
-        logger.info('[%s] Connecting to environment: vnc://%s password=%s. If desired, you can manually connect a VNC viewer, such as TurboVNC. Some environments provide a convenient in-browser VNC client: http://%s/viewer/?password=%s', name, vnc_address, vnc_password, rewarder_address, vnc_password)
+        logger.info('[%s] Connecting to environment: vnc://%s password=%s. If desired, you can manually connect a VNC viewer, such as TurboVNC. Most environments provide a convenient in-browser VNC client: http://%s/viewer/?password=%s', name, vnc_address, vnc_password, rewarder_address, vnc_password)
 
         extra_logger.info('[%s] Connecting to environment details: vnc_address=%s vnc_password=%s rewarder_address=%s rewarder_password=%s', name, vnc_address, vnc_password, rewarder_address, rewarder_password)
         self.connection_names[i] = name
