@@ -57,7 +57,7 @@ class DummyVNCEnv(vectorized.Env):
         assert self.n == len(action_n), "Expected {} actions but received {}: {}".format(self.n, len(action_n), action_n)
 
         observation_n = [{
-            'visual': np.zeros((1024, 768, 3), dtype=np.uint8),
+            'vision': np.zeros((1024, 768, 3), dtype=np.uint8),
             'text': [],
             'action': action_n[i]
         } for i in range(self.n)]

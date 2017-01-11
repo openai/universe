@@ -6,6 +6,7 @@ if six.PY2:
 else:
     import queue
 import threading
+import signal
 from twisted.internet import defer
 
 from universe.twisty import reactor
@@ -193,3 +194,16 @@ periodic_log_debug = _periodic.log_debug
 import threading
 def thread_name():
     return threading.current_thread().name
+
+def exit_on_signal():
+    """
+    Install a signal handler for HUP, INT, and TERM to call exit, allowing clean shutdown.
+    When running a universe environment, it's important to shut down the container when the
+    agent dies so you should either call this or otherwise arrange to exit on signals.
+    """
+    def shutdown(signal, frame):
+        logger.warn('Received signal %s: exiting', signal)
+        sys.exit(128+signal)
+    signal.signal(signal.SIGHUP, shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)

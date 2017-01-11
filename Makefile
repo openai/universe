@@ -4,14 +4,23 @@ upload:
 	twine upload dist/*
 
 test:
-	docker run -v $(pwd):/usr/local/universe -v /usr/bin/docker:/usr/bin/docker -v ~/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock --net=host quay.io/openai/universe:test
+	find . -name '*.pyc' -delete
+	docker build -f test.dockerfile -t quay.io/openai/universe:test .
+	docker run -v /usr/bin/docker:/usr/bin/docker -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock --net=host quay.io/openai/universe:test
 
-base:
-	docker build -t quay.io/openai/universe:base .
+build:
+	find . -name '*.pyc' -delete
+	docker build -t quay.io/openai/universe .
 	docker build -f test.dockerfile -t quay.io/openai/universe:test .
 
-	docker push quay.io/openai/universe:base
+push:
+	find . -name '*.pyc' -delete
+	docker build -t quay.io/openai/universe .
+	docker build -f test.dockerfile -t quay.io/openai/universe:test .
+
+	docker push quay.io/openai/universe
 	docker push quay.io/openai/universe:test
 
 test-push:
+	docker build -f test.dockerfile -t quay.io/openai/universe:test .
 	docker push quay.io/openai/universe:test

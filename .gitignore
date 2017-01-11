@@ -15,3 +15,4 @@ dist
 build/
 /.gitfiles
 /.tox
+/.cache

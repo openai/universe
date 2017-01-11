@@ -1,20 +1,17 @@
 #!/usr/bin/env python
 import argparse
 import logging
-import numpy as np
-import os
-import six
-import sys
-import threading
 import time
-import traceback
 
 import gym
+import numpy as np
 import universe
 from universe import pyprofile, wrappers, spaces
+from gym import wrappers as gym_wrappers
 
 # if not os.getenv("PYPROFILE_FREQUENCY"):
 #     pyprofile.profile.print_frequency = 5
+from universe import vectorized
 
 logger = logging.getLogger()
 
@@ -76,6 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--fps', default=60., type=float, help='Desired frames per second')
     parser.add_argument('-N', '--max-steps', type=int, default=10**7, help='Maximum number of steps to take')
     parser.add_argument('-E', '--max-episodes', type=int, default=10**7, help='Maximum number of episodes')
+    parser.add_argument('-T', '--start-timeout', type=int, default=None, help='Rewarder session connection timeout (seconds)')
     args = parser.parse_args()
 
     logging.getLogger('gym').setLevel(logging.NOTSET)
@@ -96,11 +94,14 @@ if __name__ == '__main__':
         # translator. Everything else probably wants a SafeActionSpace
         # wrapper to shield them from random-agent clicking around
         # everywhere.
-        env = wrappers.SafeActionSpace(env)
+        env = wrappers.experimental.SafeActionSpace(env)
     else:
         # Only gym-core are seedable
         env.seed([0])
     env = wrappers.Logger(env)
+
+    if args.monitor:
+        env = wrappers.Monitor(env, '/tmp/vnc_random_agent', force=True)
 
     env.configure(
         fps=args.fps,
@@ -108,6 +109,7 @@ if __name__ == '__main__':
         # ignore_clock_skew=True,
         remotes=args.remote,
         client_id=args.client_id,
+        start_timeout=args.start_timeout,
 
         # remotes=remote, docker_image=args.docker_image, reuse=args.reuse, ignore_clock_skew=True,
         # vnc_session_driver='go', vnc_session_kwargs={
@@ -119,10 +121,6 @@ if __name__ == '__main__':
             'encoding': 'tight', 'compress_level': 0, 'fine_quality_level': 50, 'subsample_level': 0, 'quality_level': 5,
         },
     )
-
-    if args.monitor:
-        env.monitor.start('/tmp/vnc_random_agent', force=True, video_callable=lambda i: True)
-
     if args.actions == 'random':
         action_space = env.action_space
     elif args.actions == 'noop':
