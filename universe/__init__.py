@@ -316,6 +316,22 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
             },
         )
 
+        no_frameskip_life_gym_core_id = '{}NoFrameskipEpisodicLife-v{}'.format(base, version) # e.g. SpaceInvadersNoFrameskipEpisodicLife-v3
+        register(
+            id='gym-core.{}NoFrameskipEpisodicLife-v{}'.format(base, version),
+            entry_point='universe.wrappers:WrappedGymCoreEnv',
+            tags={
+                'vnc': True,
+                'atari': True,
+                'runtime': 'gym-core',
+                'wrapper_config.TimeLimit.max_episode_steps': 400000,
+                'metadata_encoding': metadata_pixels,
+            },
+            kwargs={
+                'gym_core_id': no_frameskip_life_gym_core_id,
+            },
+        )
+
 #------------------------ Flash game environments ------------------------#
 #     Browser-based flash games, run locally
 #     in Chrome within a Docker container
