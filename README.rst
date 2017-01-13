@@ -349,6 +349,24 @@ Additional documentation
 More documentation not covered in this README can be found in the
 `doc folder <doc>`__ of this repository.
 
+Getting help
+============
+
+If you encounter a problem that is not addressed in this README page
+or in the `extra docs <doc>`__, then try our wiki page of `solutions
+to common problems
+<https://github.com/openai/universe/wiki/Solutions-to-common-problems>`__ -
+and add to it if your solution isn't there!
+
+You can also search through the `issues
+<https://github.com/openai/universe/issues?utf8=%E2%9C%93&q=is%3Aissue>`__
+on this repository and our `discussion board
+<discuss.openai.com/c/Universe>`__ to see if another user has posted
+about the same problem or to ask for help from the community.
+
+If you still can't solve your problem after trying all of the above
+steps, please post an issue on this repository.
+
 What's next?
 ============
 
