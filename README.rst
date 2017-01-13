@@ -361,7 +361,7 @@ and add to it if your solution isn't there!
 You can also search through the `issues
 <https://github.com/openai/universe/issues?utf8=%E2%9C%93&q=is%3Aissue>`__
 on this repository and our `discussion board
-<discuss.openai.com/c/Universe>`__ to see if another user has posted
+<https://discuss.openai.com/c/Universe>`__ to see if another user has posted
 about the same problem or to ask for help from the community.
 
 If you still can't solve your problem after trying all of the above
