@@ -30,7 +30,7 @@ def build(client_id, remotes, runtime=None, start_timeout=None, **kwargs):
             client_id,
             remotes,
             runtime_id=runtime.id,
-            tag=runtime.image.split(':')[-1],
+            runtime_tag=runtime.image.split(':')[-1],
             start_timeout=start_timeout,
             api_key=kwargs.get('api_key'),
             use_recorder_ports=kwargs.get('use_recorder_ports', False),

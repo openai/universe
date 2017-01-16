@@ -46,7 +46,7 @@ class AllocatorManager(threading.Thread):
 
     def __init__(self, client_id, base_url=allocator_base,
                  address_type=None, start_timeout=None, api_key=None,
-                 runtime_id=None, tag=None, params=None, placement=None,
+                 runtime_id=None, params=None, placement=None,
                  use_recorder_ports=False,
     ):
         super(AllocatorManager, self).__init__()
@@ -60,7 +60,6 @@ class AllocatorManager(threading.Thread):
         if address_type not in ['public', 'pod', 'private']:
             raise error.Error('Bad address type specified: {}. Must be public, pod, or private.'.format(address_type))
 
-        self.tag = tag
         self.client_id = client_id
         self.address_type = address_type
 
@@ -92,7 +91,6 @@ class AllocatorManager(threading.Thread):
         # in the higher layers, but this layer could support it
         # easily.
         self.runtime_id = runtime_id
-        self.tag = tag
 
         self.pending = {}
 
@@ -104,7 +102,7 @@ class AllocatorManager(threading.Thread):
         self._sleep = 1
 
     @classmethod
-    def from_remotes(cls, client_id, remotes, runtime_id, start_timeout, tag, api_key, use_recorder_ports):
+    def from_remotes(cls, client_id, remotes, runtime_id, runtime_tag, start_timeout, api_key, use_recorder_ports):
         parsed = urlparse.urlparse(remotes)
         if not (parsed.scheme == 'http' or parsed.scheme == 'https'):
             raise error.Error('AllocatorManager must start with http:// or https://: {}'.format(remotes))
@@ -114,15 +112,24 @@ class AllocatorManager(threading.Thread):
             base_url += '/' + parsed.path
         query = urlparse.parse_qs(parsed.query)
 
-        n = query.get('n', [1])[0]
+        # Intercept url-encoded params ("?n=2" and similar)
+        params = {}
+        n = query.get('n', [1])[0] # not added to params, just returned later
+
         cpu = query.get('cpu', [None])[0]
         if cpu is not None:
             cpu = float(cpu)
+            params['cpu'] = cpu
+
+        tag = query.get('tag', [None])[0]
+        if tag is not None:
+            params['tag'] = tag  # url-encoded "?tag=" gets precedence over runtimes.yml tag
+        else:
+            params['tag'] = runtime_tag
+
         placement = query.get('address', ['public'])[0]
 
-        params = {}
-        if tag is not None: params['tag'] = tag
-        if cpu is not None: params['cpu'] = cpu
+        # anything else from the query other than the components processed above will get dropped on the floor
 
         return cls(client_id=client_id, runtime_id=runtime_id, base_url=base_url, start_timeout=start_timeout, params=params, placement=placement, api_key=api_key, use_recorder_ports=use_recorder_ports), int(n)
 
