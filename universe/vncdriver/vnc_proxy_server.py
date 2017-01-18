@@ -11,6 +11,7 @@ from universe.vncdriver import auth, constants, fbs_writer
 from twisted.internet import defer, endpoints, protocol, reactor
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class LogManager(object):
     def __init__(self, base_logfile_dir, recorder_id, id):

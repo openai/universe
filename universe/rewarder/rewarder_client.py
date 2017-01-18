@@ -28,18 +28,29 @@ class RewarderClient(websocket.WebSocketClientProtocol):
 
         self._connection_result = defer.Deferred()
 
-    def send_reset(self, env_id, seed, fps, episode_id):
+    def send_reset(self, env_id, seed, fps, episode_id, episode_config):
+        ''' send_reset to universe server with the following args
+            - env_id: string to determine which env to run
+            - seed: random seed for the episode
+            - fps: fps at which the env is run
+            - episode_id: the identifier for the episode
+            - episode_config: episode-dependent config, e.g. "query" in
+            world-of-bits.
+        '''
         self._initial_reset = True
         self._reset = {
             'env_id': env_id,
             'fps': fps,
             'episode_id': episode_id,
         }
+        if episode_config:
+            self._reset.update({ 'episode_config': episode_config })
 
         return self.send('v0.env.reset', {
             'seed': seed,
             'env_id': env_id,
             'fps': fps,
+            'episode_config': episode_config
         }, {'episode_id': episode_id}, expect_reply=True)
 
     def _finish_reset(self, episode_id):

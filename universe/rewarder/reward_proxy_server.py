@@ -8,6 +8,7 @@ from universe.twisty import reactor
 from twisted.internet import endpoints
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class RewardServerClient(websocket.WebSocketClientProtocol, object):
     def __init__(self):
@@ -145,6 +146,7 @@ class RewardProxyServer(websocket.WebSocketServerProtocol, object):
 
         def _connect_callback(client):
             logger.info('[RewardProxyServer] [%d] Upstream connection %s established', self.id, remote)
+            logger.info('[RewardProxyServer] [%d] Attempting to log at directory %s', self.id, self.factory.logfile_dir)
             self.client = client
             if self.factory.logfile_dir:
                 self.begin_recording()

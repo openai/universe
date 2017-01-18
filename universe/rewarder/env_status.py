@@ -31,6 +31,7 @@ class EnvStatus(object):
         self._env_id = None
         self._env_state = None
         self._episode_id = '0'
+        self._episode_config = {}
         self._fps = None
         self.label = label or 'EnvStatus'
         self.primary = primary
@@ -41,10 +42,11 @@ class EnvStatus(object):
                 'env_state': self._env_state,
                 'env_id': self._env_id,
                 'episode_id': self._episode_id,
+                'episode_config': self._episode_config,
                 'fps': self._fps,
             }
 
-    def set_env_info(self, env_state=None, env_id=None, episode_id=None, bump_past=None, fps=None):
+    def set_env_info(self, env_state=None, env_id=None, episode_id=None, episode_config=None, bump_past=None, fps=None):
         """Atomically set the environment state tracking variables.
         """
         with self.cv:
@@ -74,6 +76,7 @@ class EnvStatus(object):
             else:
                 assert episode_id is not None, "No episode_id provided. This likely indicates a misbehaving server, which did not send an episode_id"
                 self._episode_id = episode_id
+            self._episode_config = episode_config
             self._fps = fps
             logger.info('[%s] Changing env_state: %s (env_id=%s) -> %s (env_id=%s) (episode_id: %s->%s, fps=%s)', self.label, self._env_state, self._env_id, env_state, env_id, old_episode_id, self._episode_id, self._fps)
             self._env_state = env_state
@@ -86,6 +89,11 @@ class EnvStatus(object):
     def episode_id(self):
         with self.cv:
             return self._episode_id
+
+    @property
+    def episode_config(self):
+        with self.cv:
+            return self._episode_config
 
     @property
     def env_state(self):

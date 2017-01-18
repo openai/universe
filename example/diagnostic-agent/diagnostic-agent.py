@@ -162,6 +162,10 @@ if __name__ == '__main__':
         # Take an action
         with pyprofile.push('env.step'):
             observation_n, reward_n, done_n, info = env.step(action_n)
+            try:
+                print(observation_n[0]['text'])
+            except:
+                pass
 
         episode_length += 1
         if not all(r is None for r in reward_n): # checks if we connected the rewarder

@@ -118,6 +118,7 @@ class VNCEnv(vectorized.Env):
         self.action_space = spaces.VNCActionSpace()
 
         self._seed_value = None
+        self._episode_config = None
         self._remotes_manager = None
 
         self._probe_key = probe_key or 0xbeef1
@@ -249,6 +250,9 @@ class VNCEnv(vectorized.Env):
             # allocation.
             self._handle_connect()
 
+    def _episode_configure(self, **episode_config):
+        self._episode_config = episode_config
+
     def connect(self, i, name, vnc_address, rewarder_address, vnc_password=None, rewarder_password=None):
         logger.info('[%s] Connecting to environment: vnc://%s password=%s. If desired, you can manually connect a VNC viewer, such as TurboVNC. Most environments provide a convenient in-browser VNC client: http://%s/viewer/?password=%s', name, vnc_address, vnc_password, rewarder_address, vnc_password)
 
@@ -296,7 +300,8 @@ class VNCEnv(vectorized.Env):
                 label=self.connection_labels[i],
                 start_timeout=self.remote_manager.start_timeout,
                 observer=self._observer,
-                skip_network_calibration=self._skip_network_calibration
+                skip_network_calibration=self._skip_network_calibration,
+                episode_config=self._episode_config
             )
         else:
             network = None
@@ -331,7 +336,7 @@ class VNCEnv(vectorized.Env):
         self._handle_connect()
 
         if self.rewarder_session:
-            self.rewarder_session.reset()
+            self.rewarder_session.reset(episode_config=self._episode_config)
         self._reset_mask()
         return [None] * self.n
 
