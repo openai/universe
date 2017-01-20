@@ -35,6 +35,8 @@ class HardcodedAddresses(object):
         self.supports_reconnect = False
         self.connect_vnc = vnc_addresses is not None
         self.connect_rewarder = rewarder_addresses is not None
+        if rewarder_addresses is None:
+            logger.info("No rewarder addresses were provided, so this env cannot connect to the remote's rewarder channel, and cannot send control messages (e.g. reset)")
 
         self.vnc_addresses = vnc_addresses
         self.vnc_password = vnc_password

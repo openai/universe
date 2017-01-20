@@ -332,6 +332,8 @@ class VNCEnv(vectorized.Env):
 
         if self.rewarder_session:
             self.rewarder_session.reset()
+        else:
+            logger.info("No rewarder session exists, so cannot send a reset via the rewarder channel")
         self._reset_mask()
         return [None] * self.n
 
