@@ -82,8 +82,11 @@ class LogManager(object):
         else:
             logger.info("%s does not exist; not copying into recording directory", self.global_env_id_file)
 
-        if os.environ.get('COMPLETED_DEMONSTRATION_DIR', None):
-            shutil.copytree(self.logfile_dir, os.path.join(os.environ['COMPLETED_DEMONSTRATION_DIR'], os.path.basename(self.logfile_dir)))
+        if os.environ.get('COMPLETED_DEMONSTRATION_DIR'):
+            dest = os.path.join(os.environ['COMPLETED_DEMONSTRATION_DIR'], os.path.basename(self.logfile_dir))
+            logger.info('copying to %s', dest)
+            shutil.copytree(self.logfile_dir, dest)
+            shutil.copystat(self.logfile_dir, dest)
 
 
 class VNCProxyServer(protocol.Protocol, object):
