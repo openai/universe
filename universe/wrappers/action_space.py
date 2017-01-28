@@ -52,6 +52,37 @@ def gym_core_action_space(gym_core_id):
         raise error.Error('Unsupported env type: {}'.format(spec.id))
 
 
+class SoftmaxClickMouse(vectorized.ActionWrapper):
+    def __init__(self, env, active_region=(10, 75 + 50, 10 + 160, 75 + 210), discrete_mouse_step=10, noclick_regions=[]):
+        super(SoftmaxClickMouse, self).__init__(env)
+        xlow, ylow, xhigh, yhigh = active_region
+        xs = range(xlow, xhigh, discrete_mouse_step)
+        ys = range(ylow, yhigh, discrete_mouse_step)
+        self._actions = []
+        removed = 0
+        for x in xs:
+            for y in ys:
+                xc = min(x+int(discrete_mouse_step/2), xhigh-1) # click to center of a cell
+                yc = min(y+int(discrete_mouse_step/2), yhigh-1)
+                if any(self.is_contained((xc, yc), r) for r in noclick_regions):
+                    removed += 1
+                    continue
+                e1 = spaces.PointerEvent(xc, yc, buttonmask=0) # release
+                e2 = spaces.PointerEvent(xc, yc, buttonmask=1) # click
+                e3 = spaces.PointerEvent(xc, yc, buttonmask=0) # release
+                self._actions.append([e1, e2, e3])
+        logger.info('noclick regions removed {} of {} actions'.format(removed, removed + len(self._actions)))
+        self.action_space = gym.spaces.Discrete(len(self._actions))
+
+    def _action(self, action_n):
+        return [self._actions[int(action)] for action in action_n]
+
+    @classmethod
+    def is_contained(cls, point, coords):
+        px, py = point
+        x, width, y, height = coords
+        return x <= px <= x + width and y <= py <= y + height
+
 
 class SafeActionSpace(vectorized.Wrapper):
     """

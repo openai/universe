@@ -15,6 +15,9 @@ from universe import vectorized
 
 logger = logging.getLogger()
 
+CHROME_X_OFFSET = 18
+CHROME_Y_OFFSET = 84
+
 class NoopSpace(gym.Space):
     """ Null action space """
     def sample(self, seed=0):
@@ -58,7 +61,7 @@ if __name__ == '__main__':
     universe.configure_logging()
 
     # Actions this agent will take, 'random' is the default
-    action_choices = ['random', 'noop', 'forward']
+    action_choices = ['random', 'noop', 'forward', 'click']
 
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument('-e', '--env_id', default='gym-core.Pong-v3', help='Which environment to run on.')
@@ -103,6 +106,24 @@ if __name__ == '__main__':
     if args.monitor:
         env = wrappers.Monitor(env, '/tmp/vnc_random_agent', force=True)
 
+    if args.actions == 'random':
+        action_space = env.action_space
+    elif args.actions == 'noop':
+        action_space = NoopSpace()
+    elif args.actions == 'forward':
+        action_space = ForwardSpace()
+    elif args.actions == 'click':
+        spec = universe.runtime_spec('flashgames').server_registry[args.env_id]
+        height = spec["height"]
+        width = spec["width"]
+        noclick_regions = [r['coordinates'] for r in spec['regions'] if r['type'] == 'noclick'] if spec.get('regions') else []
+        active_region = (CHROME_X_OFFSET, CHROME_Y_OFFSET, CHROME_X_OFFSET + width, CHROME_Y_OFFSET + height)
+        env = wrappers.SoftmaxClickMouse(env, active_region=active_region, noclick_regions=noclick_regions)
+        action_space = env.action_space
+    else:
+        logger.error("Invalid action choice: {}".format(args.actions))
+        exit(1)
+
     env.configure(
         fps=args.fps,
         # print_frequency=None,
@@ -121,15 +142,6 @@ if __name__ == '__main__':
             'encoding': 'tight', 'compress_level': 0, 'fine_quality_level': 50, 'subsample_level': 0, 'quality_level': 5,
         },
     )
-    if args.actions == 'random':
-        action_space = env.action_space
-    elif args.actions == 'noop':
-        action_space = NoopSpace()
-    elif args.actions == 'forward':
-        action_space = ForwardSpace()
-    else:
-        logger.error("Invalid action choice: {}".format(args.actions))
-        exit(1)
 
     agent = RandomAgent(action_space, n=env.n, vectorized=env.metadata['runtime.vectorized'])
 
