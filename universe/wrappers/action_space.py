@@ -55,6 +55,7 @@ def gym_core_action_space(gym_core_id):
 class SoftmaxClickMouse(vectorized.ActionWrapper):
     def __init__(self, env, active_region=(10, 75 + 50, 10 + 160, 75 + 210), discrete_mouse_step=10, noclick_regions=[]):
         super(SoftmaxClickMouse, self).__init__(env)
+        logger.info('Using SoftmaxClickMouse with action_region={}, noclick_regions={}'.format(active_region, noclick_regions))
         xlow, ylow, xhigh, yhigh = active_region
         xs = range(xlow, xhigh, discrete_mouse_step)
         ys = range(ylow, yhigh, discrete_mouse_step)
