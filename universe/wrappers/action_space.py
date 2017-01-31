@@ -53,13 +53,22 @@ def gym_core_action_space(gym_core_id):
 
 
 class SoftmaxClickMouse(vectorized.ActionWrapper):
+    '''
+    Creates a Discrete action space of mouse clicks.
+
+    This wrapper divides the active region into cells and creates an action for
+    each which clicks in the middle of the cell.
+    '''
     def __init__(self, env, active_region=(10, 75 + 50, 10 + 160, 75 + 210), discrete_mouse_step=10, noclick_regions=[]):
         super(SoftmaxClickMouse, self).__init__(env)
         logger.info('Using SoftmaxClickMouse with action_region={}, noclick_regions={}'.format(active_region, noclick_regions))
         xlow, ylow, xhigh, yhigh = active_region
         xs = range(xlow, xhigh, discrete_mouse_step)
         ys = range(ylow, yhigh, discrete_mouse_step)
-        self._actions = []
+        self.active_region = active_region
+        self.discrete_mouse_step = discrete_mouse_step
+        self.noclick_regions = noclick_regions
+        self._points = []
         removed = 0
         for x in xs:
             for y in ys:
@@ -68,15 +77,47 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
                 if any(self.is_contained((xc, yc), r) for r in noclick_regions):
                     removed += 1
                     continue
-                e1 = spaces.PointerEvent(xc, yc, buttonmask=0) # release
-                e2 = spaces.PointerEvent(xc, yc, buttonmask=1) # click
-                e3 = spaces.PointerEvent(xc, yc, buttonmask=0) # release
-                self._actions.append([e1, e2, e3])
-        logger.info('noclick regions removed {} of {} actions'.format(removed, removed + len(self._actions)))
-        self.action_space = gym.spaces.Discrete(len(self._actions))
+                self._points.append((xc, yc))
+        logger.info('SoftmaxClickMouse noclick regions removed {} of {} actions'.format(removed, removed + len(self._points)))
+        self.action_space = gym.spaces.Discrete(len(self._points))
 
     def _action(self, action_n):
-        return [self._actions[int(action)] for action in action_n]
+        return [self._discrete_to_action(int(i)) for i in action_n]
+
+    def _discrete_to_action(self, i):
+        xc, yc = self._points[i]
+        return [
+            spaces.PointerEvent(xc, yc, buttonmask=0), # release
+            spaces.PointerEvent(xc, yc, buttonmask=1), # click
+            spaces.PointerEvent(xc, yc, buttonmask=0), # release
+        ]
+
+    def _reverse_action(self, action_n):
+        return [self._reverse_action_d(action) for action in action_n]
+
+    def _reverse_action_d(self, action):
+        # find first valid mousedown, ignore everything else
+        click_event = next(e for e in action \
+                if isinstance(e, spaces.PointerEvent) \
+                and e.buttonmask == 1 \
+                and not any(self.is_contained((e.x, e.y), r) for r in self.noclick_regions))
+        if click_event:
+            return self._action_to_discrete(click_event)
+        else:
+            return []
+
+    def _action_to_discrete(self, event):
+        assert isinstance(event, spaces.PointerEvent)
+        x, y = event.x, event.y
+        step = self.discrete_mouse_step
+        xlow, ylow, xhigh, yhigh = self.active_region
+        xc = min((int((x - xlow) / step) * step) + xlow + step / 2, xhigh - 1)
+        yc = min((int((y - ylow) / step) * step) + ylow + step / 2, yhigh - 1)
+        try:
+            return self._points.index((xc, yc))
+        except ValueError:
+            logger.error('{} is not in {}'.format((xc, yc), self._points))
+            raise
 
     @classmethod
     def is_contained(cls, point, coords):
