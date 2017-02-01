@@ -4,6 +4,8 @@ import gym
 from universe import error, spaces
 from universe import vectorized
 
+import numpy as np
+
 logger = logging.getLogger(__name__)
 
 
@@ -99,10 +101,14 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
                     if isinstance(e, spaces.PointerEvent) \
                     and e.buttonmask == 1 \
                     and not any(self.is_contained((e.x, e.y), r) for r in self.noclick_regions))
-            return self._action_to_discrete(click_event)
+            index = self._action_to_discrete(click_event)
+
+            # return one-hot vector, expected by demo training code
+            # FIXME(jgray): move one-hot translation to separate layer
+            return np.eye(len(self._points))[index]
         except StopIteration:
             # no valid mousedowns
-            return []
+            return np.zeros(len(self._points))
 
     def _action_to_discrete(self, event):
         assert isinstance(event, spaces.PointerEvent)
