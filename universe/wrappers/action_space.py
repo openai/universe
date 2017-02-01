@@ -95,17 +95,17 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
         ]
 
     def _reverse_action(self, action):
+        xlow, ylow, xhigh, yhigh = self.active_region
         try:
             # find first valid mousedown, ignore everything else
-            click_event = next(e for e in action \
-                    if isinstance(e, spaces.PointerEvent) \
-                    and e.buttonmask == 1 \
-                    and not any(self.is_contained((e.x, e.y), r) for r in self.noclick_regions))
+            click_event = next(e for e in action if isinstance(e, spaces.PointerEvent) and e.buttonmask == 1)
             index = self._action_to_discrete(click_event)
-
-            # return one-hot vector, expected by demo training code
-            # FIXME(jgray): move one-hot translation to separate layer
-            return np.eye(len(self._points))[index]
+            if index is None:
+                return np.zeros(len(self._points))
+            else:
+                # return one-hot vector, expected by demo training code
+                # FIXME(jgray): move one-hot translation to separate layer
+                return np.eye(len(self._points))[index]
         except StopIteration:
             # no valid mousedowns
             return np.zeros(len(self._points))
@@ -120,8 +120,8 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
         try:
             return self._points.index((xc, yc))
         except ValueError:
-            logger.error('{} is not in {}'.format((xc, yc), self._points))
-            raise
+            logger.info('{} is not in action space; event={}'.format((xc, yc), event))
+            return None
 
     @classmethod
     def is_contained(cls, point, coords):
