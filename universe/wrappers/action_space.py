@@ -82,10 +82,7 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
         self.action_space = gym.spaces.Discrete(len(self._points))
 
     def _action(self, action_n):
-        r = [self._discrete_to_action(int(i)) for i in action_n]
-        assert action_n == self._reverse_action(r)
-        assert action_n == self._reverse_action(r[0]), '{} -> {} -> {}'.format(action_n, r, self._reverse_action(r[0]))
-        return r
+        return [self._discrete_to_action(int(i)) for i in action_n]
 
     def _discrete_to_action(self, i):
         xc, yc = self._points[i]
