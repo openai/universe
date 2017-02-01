@@ -120,7 +120,7 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
         try:
             return self._points.index((xc, yc))
         except ValueError:
-            logger.info('{} is not in action space; event={}'.format((xc, yc), event))
+            # ignore clicks outside of active region or in noclick regions
             return None
 
     @classmethod
