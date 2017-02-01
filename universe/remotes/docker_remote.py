@@ -110,15 +110,27 @@ class DockerManager(object):
         )
 
 def get_client():
+    """
+    Set DOCKER_HOST (and probably DOCKER_TLS_VERIFY and DOCKER_CERT_PATH) to connect to a docker instance through TCP.
+    Leave DOCKER_HOST unset and it will use the default, typically unix:/var/run/docker.sock
+
+    It also needs to know how to connect to ports on the docker container after creating it.
+    Set DOCKER_NET_HOST to provide an IP address to connect to the VNC ports on
+    otherwise if DOCKER_HOST has a hostname, it will connect to the VNC ports using that name.
+    otherwise it connects using localhost
+    """
     info = {}
     host = os.environ.get('DOCKER_HOST')
+    net_host = os.environ.get('DOCKER_NET_HOST')
 
     client_api_version = os.environ.get('DOCKER_API_VERSION')
     if not client_api_version:
         client_api_version = "auto"
 
     # IP to use for started containers
-    if host:
+    if net_host:
+        info['host'] = net_host
+    elif host:
         info['host'] = urlparse.urlparse(host).netloc.split(':')[0]
     else:
         info['host'] = 'localhost'

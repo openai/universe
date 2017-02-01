@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import sys
+import os
 import threading
 
 from collections import namedtuple
@@ -18,7 +19,8 @@ from universe.remotes.compose.signals import ShutdownException
 from universe.remotes.compose.utils import split_buffer
 
 def build(containers, service_names, **kwargs):
-    presenters = build_log_presenters(service_names, False)
+    monochrome = not os.isatty(1)
+    presenters = build_log_presenters(service_names, monochrome)
     printer = LogPrinter(containers, presenters, **kwargs)
     printer.start()
 

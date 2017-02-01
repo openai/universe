@@ -24,19 +24,19 @@ run ``docker ps`` and get something like this:
      $ docker ps
      CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 
-	 
+
 How to start a remote
 =====================
-	 
+
 There are currently three ways to start a remote:
 
 - Create an **automatic local remote** using ``env.configure(remotes=1)``.
   In this case, ``universe`` automatically creates a remote locally by spinning
   up a docker container for you.
-  
+
 - Create a **manual remote** by spinning up your own Docker container,
   locally or on a server you control.
-  
+
 - Create a **starter cluster** in AWS, which will automatically provide you
   with cloud-hosted remotes.
 
@@ -62,6 +62,25 @@ container and start 1 copy of it locally.
             action_n = [[('KeyEvent', 'ArrowUp', True)] for ob in observation_n] # your agent here
             observation_n, reward_n, done_n, info = env.step(action_n)
             env.render()
+
+
+Agents inside Docker
+~~~~~~~~~~~~~~~~~~~~
+If you're running your agent inside a Docker container, it can still create automatic remotes by connecting
+to the docker daemon on the host. To do this, mount the docker binary and socket inside the agent container like this:
+
+.. code:: shell
+
+    $ docker run --privileged \
+        -v /usr/bin/docker:/usr/bin/docker \
+        -v /root/.docker:/root/.docker \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -e DOCKER_NET_HOST=172.17.0.1 \
+        ... \
+        my/agent:latest
+
+
+The Universe remote will use ``$DOCKER_NET_HOST`` when connecting to the VNC and rewarder ports.
 
 
 Manual remotes
@@ -109,8 +128,8 @@ VNC compression settings
 -----------------------------------------------
 
 The VNC connection supports multiple compression settings that control the tradeoff
-between a fast but highly compressed, low quality data stream and slow, uncompressed 
-data stream. These can be configured by using the ``vnc_kwargs`` argument to 
+between a fast but highly compressed, low quality data stream and slow, uncompressed
+data stream. These can be configured by using the ``vnc_kwargs`` argument to
 ``env.configure``. The default arguments are:
 
 .. code:: python
@@ -118,12 +137,12 @@ data stream. These can be configured by using the ``vnc_kwargs`` argument to
     env.configure(vnc_kwargs={'encoding':'tight', 'fine_quality_level':50, 'subsample_level':2})
 
 Here, ``tight`` is a lossy encoding that uses JPEG for compression. We also support ``zrle`` instead, which is lossless.
-The ``fine_quality_level`` controls the compression strength from high compression / low quality (0) to low compression / high quality (100). 
+The ``fine_quality_level`` controls the compression strength from high compression / low quality (0) to low compression / high quality (100).
 For ``subsample_level``, 0 is highest quality, 2 is low quality and 3 is greyscale. You can investigate the effects
-of many of these options on the visual fidelity by connecting to an environment using TurboVNC, which allows you to 
+of many of these options on the visual fidelity by connecting to an environment using TurboVNC, which allows you to
 tune these settings in the user interface.
 
-Note that the codecs always operate on deltas of the screen, so if large portions of your screen are not changing then 
+Note that the codecs always operate on deltas of the screen, so if large portions of your screen are not changing then
 you might be able to afford higher quality settings. Conversely, if you're playing a racing game that takes up a large
 portion of the screen you should be more worried about bandwidth. The call to ``step`` is asynchronous with respect to
 new frames arriving, so if the connection is too slow the environments will lag.
@@ -146,7 +165,7 @@ Once your stack on AWS is ready, run `starter-cluster` to start your environment
 or example, the follow will start two flashgames remotes:
 
   .. code:: shell
-			
+
     $ pip install -r bin/starter-cluster-requirements.txt
     $ bin/starter-cluster -v start -s OpenAI-Universe -i my-ec2-key.pem -r flashgames -n 2
     Creating network "flashgames_default" with the default driver
@@ -164,13 +183,13 @@ Now you can pass the IP address and ports for your remotes to your agent,
 as was described in the previous section on manual remotes. For example:
 
   .. code:: shell
-			
+
     $ python bin/random_agent.py -e flashgames.DuskDrive-v0 -r vnc://54.245.154.123:5013+5015,54.245.154.123:5006+5008
 
 Running ``bin/starter-cluster start`` again will restart your remotes. To stop them, run:
 
   .. code:: shell
-			
+
     $ bin/starter-cluster stop -s OpenAI-Universe -i my-ec2-key.pem -r flashgames
     Stopping flashgames_flashgames-1_1 ... done
     Stopping flashgames_flashgames-0_1 ... done
@@ -194,7 +213,7 @@ Scaling Up
 If you encounter the following
 
 .. code:: shell
-   
+
   $ bin/starter-cluster -v start -s OpenAI-Universe -i my-ec2-key.pem -r flashgames   -n 2
     Creating network "flashgames_default" with the default driver
     Pulling flashgames-0 (quay.io/openai/universe.flashgames:0.19.36)...
@@ -244,5 +263,3 @@ The configuration for the runtimes is defined in
 and the specific version number tags for the corresponding Docker
 images are specified in
 `runtimes.yml <https://github.com/openai/universe/blob/master/universe/runtimes.yml>`__.
-
-
