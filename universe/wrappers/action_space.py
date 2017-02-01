@@ -82,7 +82,10 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
         self.action_space = gym.spaces.Discrete(len(self._points))
 
     def _action(self, action_n):
-        return [self._discrete_to_action(int(i)) for i in action_n]
+        r = [self._discrete_to_action(int(i)) for i in action_n]
+        assert action_n == self._reverse_action(r)
+        assert action_n == self._reverse_action(r[0]), '{} -> {} -> {}'.format(action_n, r, self._reverse_action(r[0]))
+        return r
 
     def _discrete_to_action(self, i):
         xc, yc = self._points[i]
@@ -92,18 +95,16 @@ class SoftmaxClickMouse(vectorized.ActionWrapper):
             spaces.PointerEvent(xc, yc, buttonmask=0), # release
         ]
 
-    def _reverse_action(self, action_n):
-        return [self._reverse_action_d(action) for action in action_n]
-
-    def _reverse_action_d(self, action):
-        # find first valid mousedown, ignore everything else
-        click_event = next(e for e in action \
-                if isinstance(e, spaces.PointerEvent) \
-                and e.buttonmask == 1 \
-                and not any(self.is_contained((e.x, e.y), r) for r in self.noclick_regions))
-        if click_event:
+    def _reverse_action(self, action):
+        try:
+            # find first valid mousedown, ignore everything else
+            click_event = next(e for e in action \
+                    if isinstance(e, spaces.PointerEvent) \
+                    and e.buttonmask == 1 \
+                    and not any(self.is_contained((e.x, e.y), r) for r in self.noclick_regions))
             return self._action_to_discrete(click_event)
-        else:
+        except StopIteration:
+            # no valid mousedowns
             return []
 
     def _action_to_discrete(self, event):
