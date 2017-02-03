@@ -189,6 +189,7 @@ class Profile(object):
 
         self.print_frequency = print_frequency
         self.last_export = None
+        self.export_hooks = [self._print_export]
 
         self.print_filter = print_filter
         self._in_txn = False
@@ -199,6 +200,9 @@ class Profile(object):
         self.timers = {}
         self.counters = {}
         self.gauges = {}
+
+    def add_export_hook(self, hook):
+        self.export_hooks.append(hook)
 
     def __enter__(self):
         self.lock.acquire()
@@ -297,6 +301,8 @@ class Profile(object):
                     'std': stat['std'].std(),
                     'mean': stat['std'].mean(),
                     'unit': stat['unit'],
+                    'total': stat['total'],
+                    'rate': stat['rate'].avg(),
                 }
 
             gauges = {}
@@ -318,7 +324,8 @@ class Profile(object):
                 }
             }
             if log:
-                self._print_export(export)
+                for hook in self.export_hooks:
+                    hook(export)
             if reset:
                 self.reset()
             return export
@@ -374,7 +381,7 @@ class Profile(object):
 
 print_frequency = os.environ.get('PYPROFILE_FREQUENCY')
 if print_frequency is not None:
-    print_frequency = int(print_frequency)
+    print_frequency = float(print_frequency)
 
 print_prefix = os.environ.get('PYPROFILE_PREFIX')
 if print_prefix is not None:
