@@ -241,7 +241,7 @@ class Diagnostics(object):
             self.instance_n = None
 
     def add_probe(self, action_n, mask_n):
-        if self.disable_action_probes:
+        if self.disable_action_probes or self.instance_n is None:
             return
 
         for instance, action, mask in zip(self.instance_n, action_n, mask_n):
@@ -273,6 +273,8 @@ class Diagnostics(object):
                 for instance, observation in zip(self.instance_n, observation_n)]
 
     def clear_probes_when_done(self, done_n):
+        if self.instance_n is None: # if we've been closed there's nothing to do
+            return
         for instance, done in zip(self.instance_n, done_n):
             if done:
                 instance.clear_probe()
