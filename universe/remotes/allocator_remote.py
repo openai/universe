@@ -259,7 +259,7 @@ class AllocatorManager(threading.Thread):
             logger.info('Pending remote envs %s were not returned by the allocator (only %s were returned). Assuming the missing ones have gone down and requesting replacements.', dropped, list(result))
             for d in dropped:
                 spec = self.pending.pop(d)
-                self._allocate(dropped, False, spec['params'])
+                self._allocate([spec['handle']], False, spec['params'])
 
         # Handle successful allocations
         self._handle_allocation(allocation, pop=True)
