@@ -1452,6 +1452,16 @@ for game in [
     'flashgames.ZombiesVsBrains-v0',
     'flashgames.Zombonarium-v0',
     'flashgames.ZooRacer-v0',
+
+    # unpermissioned games
+    'flashgames.HotRods3d-v0',
+    'flashgames.SupersonicSpeeders-v0',
+    'flashgames.PixelPaperKart-v0',
+    'flashgames.WickedRider-v0',
+    'flashgames.JustShutUpAndDrive2-v0',
+    'flashgames.JustShutUpAndDrive-v0',
+    'flashgames.JetVelocity3d-v0',
+    'flashgames.TZeroTurboX-v0',
     ]:
     register(
         id=game,
