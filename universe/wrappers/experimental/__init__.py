@@ -1,2 +1,2 @@
-from universe.wrappers.experimental.action_space import SafeActionSpace
+from universe.wrappers.experimental.action_space import SafeActionSpace, SoftmaxClickMouse
 from universe.wrappers.experimental.observation import CropObservations
