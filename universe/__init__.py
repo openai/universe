@@ -977,6 +977,7 @@ for game in [
     'flashgames.NeonRaceLvl6-v0',
     'flashgames.NeonRaceLvl7-v0',
     'flashgames.NeonRaceLvl8-v0',
+    'flashgames.NeonRaceRandomLvl-v0',
     'flashgames.NeonRace2-v0',
     'flashgames.Neopods-v0',
     'flashgames.NervousLadybug-v0',
