@@ -2,16 +2,45 @@ import logging
 import gym
 import time
 import numpy as np
-
-from gym import spaces
+from universe import error
+from gym import spaces as gym_spaces
+from universe import spaces
 from universe import rewarder, vectorized
-from universe.wrappers import action_space
 from universe.envs.vnc_core_env import translator
 
 logger = logging.getLogger(__name__)
 
 ATARI_HEIGHT = 210
 ATARI_WIDTH = 160
+
+def atari_vnc(up=False, down=False, left=False, right=False, z=False):
+    return [spaces.KeyEvent.by_name('up', down=up),
+            spaces.KeyEvent.by_name('left', down=left),
+            spaces.KeyEvent.by_name('right', down=right),
+            spaces.KeyEvent.by_name('down', down=down),
+            spaces.KeyEvent.by_name('z', down=z)]
+
+def gym_core_action_space(gym_core_id):
+    spec = gym.spec(gym_core_id)
+
+    if spec.id == 'CartPole-v0':
+        return spaces.Hardcoded([[spaces.KeyEvent.by_name('left', down=True)],
+                                 [spaces.KeyEvent.by_name('left', down=False)]])
+    elif spec._entry_point.startswith('gym.envs.atari:'):
+        actions = []
+        env = spec.make()
+        for action in env.unwrapped.get_action_meanings():
+            z = 'FIRE' in action
+            left = 'LEFT' in action
+            right = 'RIGHT' in action
+            up = 'UP' in action
+            down = 'DOWN' in action
+            translated = atari_vnc(up=up, down=down, left=left, right=right, z=z)
+            actions.append(translated)
+        return spaces.Hardcoded(actions)
+    else:
+        raise error.Error('Unsupported env type: {}'.format(spec.id))
+
 
 class CropAtari(vectorized.ObservationWrapper):
     """
@@ -20,7 +49,7 @@ Crop the relevant portion of the monitor where an Atari enviroment resides.
 
     def __init__(self, env):
         super(CropAtari, self).__init__(env)
-        self.observation_space = spaces.Box(0, 255, shape=(ATARI_HEIGHT, ATARI_WIDTH, 3))
+        self.observation_space = gym_spaces.Box(0, 255, shape=(ATARI_HEIGHT, ATARI_WIDTH, 3))
 
     def _observation(self, observation_n):
         return [{'vision': ob['vision'][:ATARI_HEIGHT, :ATARI_WIDTH, :]} for ob in observation_n]
@@ -39,10 +68,10 @@ class GymCoreAction(vectorized.ActionWrapper):
             gym_core_id = self.spec._kwargs['gym_core_id']
 
         spec = gym.spec(gym_core_id)
-        raw_action_space = action_space.gym_core_action_space(gym_core_id)
+        raw_action_space = gym_core_action_space(gym_core_id)
 
         self._actions = raw_action_space.actions
-        self.action_space = spaces.Discrete(len(self._actions))
+        self.action_space = gym_spaces.Discrete(len(self._actions))
 
         if spec._entry_point.startswith('gym.envs.atari:'):
             self.key_state = translator.AtariKeyState(gym.make(gym_core_id))
