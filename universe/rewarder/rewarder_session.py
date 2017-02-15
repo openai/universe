@@ -228,16 +228,16 @@ class RewarderSession(object):
                 self.errors.clear()
         return errors
 
-    def reset(self, seed=None):
+    def reset(self, seed=None, env_id=None):
         with self.lock:
             for i, reward_buffer in self.reward_buffers.items():
                 reward_buffer.mask()
-        reactor.callFromThread(self._reset, seed=seed)
+        reactor.callFromThread(self._reset, seed=seed, env_id=env_id)
 
-    def _reset(self, seed=None):
+    def _reset(self, seed=None, env_id=None):
         with self.lock:
             for client in self.clients.values():
-                d = self._send_env_reset(client, seed=seed)
+                d = self._send_env_reset(client, seed=seed, env_id=env_id)
                 # Total hack to capture the variable in the closure
                 def callbacks(client):
                     def success(reply): pass
@@ -247,12 +247,12 @@ class RewarderSession(object):
                 d.addCallback(success)
                 d.addErrback(fail)
 
-    def _send_env_reset(self, client, seed=None, episode_id=None):
+    def _send_env_reset(self, client, seed=None, episode_id=None, env_id=None):
         if episode_id is None:
             episode_id = client.factory.env_status.episode_id
         logger.info('[%s] Sending reset for env_id=%s fps=%s episode_id=%s', client.factory.label, client.factory.arg_env_id, client.factory.arg_fps, episode_id)
         return client.send_reset(
-            env_id=client.factory.arg_env_id,
+            env_id=client.factory.arg_env_id if env_id is None else env_id,
             seed=seed,
             fps=client.factory.arg_fps,
             episode_id=episode_id)

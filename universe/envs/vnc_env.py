@@ -1,6 +1,7 @@
 import getpass
 import logging
 import os
+import random
 import uuid
 
 import universe
@@ -143,6 +144,7 @@ class VNCEnv(vectorized.Env):
                    replace_on_crash=False, allocate_sync=True,
                    observer=False, api_key=None,
                    record=False,
+                   sample_env_ids=None,
     ):
         """Standard Gym hook to configure the environment.
 
@@ -238,6 +240,8 @@ class VNCEnv(vectorized.Env):
         else:
             self.diagnostics = None
 
+        self._sample_env_ids = sample_env_ids
+
         self._reset_mask()
         self._started = True
 
@@ -332,7 +336,12 @@ class VNCEnv(vectorized.Env):
         self._handle_connect()
 
         if self.rewarder_session:
-            self.rewarder_session.reset()
+            if self._sample_env_ids:
+                env_id = random.choice(self._sample_env_ids)
+                logger.info("Randomly sampled env_id={}".format(env_id))
+            else:
+                env_id = None
+            self.rewarder_session.reset(env_id=env_id)
         else:
             logger.info("No rewarder session exists, so cannot send a reset via the rewarder channel")
         self._reset_mask()
