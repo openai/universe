@@ -135,7 +135,7 @@ class FakeRewarder(object):
     def __init__(self):
         self.connections = {}
 
-    def reset(self, seed=None):
+    def reset(self, seed=None, **kwargs):
         for conn in self.connections.values():
             conn.reset(seed=seed)
 
