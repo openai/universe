@@ -23,6 +23,9 @@ logger = logging.getLogger(__name__)
 # pyprofile.profile.print_frequency = 1
 # pyprofile.profile.print_filter = lambda event: event.startswith('vncdriver.recv_rectangle')
 
+class UnknownEncoding(Exception):
+    pass
+
 def peer_address(peer):
     return '{}:{}'.format(peer.host, peer.port)
 
@@ -276,7 +279,7 @@ class VNCClient(protocol.Protocol, object):
             length += int(math.floor((width + 7.0) / 8)) * height
             self.expect(self.recv_DecodePseudoCursor, length, x, y, width, height)
         else:
-            assert False, 'Unknown pixel encoding received: {}'.format(encoding)
+            raise UnknownEncoding('Unknown pixel encoding received: {}'.format(encoding))
 
     # Encodings
 
