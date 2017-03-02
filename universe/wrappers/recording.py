@@ -3,7 +3,8 @@ import time
 import os
 import json
 import numpy as np
-import threading, queue
+import threading
+from six.moves import queue
 from universe import rewarder, spaces, vectorized, pyprofile
 from universe.utils import random_alphanumeric
 
