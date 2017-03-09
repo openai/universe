@@ -11,8 +11,8 @@ DEFAULT_MAX_EPISODE_SECONDS = 20 * 60.  # Default to 20 minutes if there is no e
 class UniverseTimeLimit(core.Wrapper):
     def _configure(self, **kwargs):
         super(TimeLimit, self)._configure(**kwargs)
-        self._max_episode_seconds = self.env.spec.tags.get('wrapper_config.TimeLimit.max_episode_seconds', None)
-        self._max_episode_steps = self.env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps', None)
+        self._max_episode_seconds = self.env.spec.max_episode_seconds
+        self._max_episode_steps = self.env.spec.max_episode_steps
 
         if self._max_episode_seconds is None and self._max_episode_steps is None:
             self._max_episode_seconds = DEFAULT_MAX_EPISODE_SECONDS

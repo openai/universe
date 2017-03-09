@@ -112,11 +112,11 @@ metadata_pixels = {
 register(
     id='gym-core.CartPoleLowDSync-v0',
     entry_point='universe.wrappers:WrappedGymCoreSyncEnv',
+    max_episode_steps=500,
     tags={
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
-        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'rewarder_observation': True,
@@ -129,11 +129,11 @@ register(
 register(
     id='gym-core.CartPoleSync-v0',
     entry_point='universe.wrappers:WrappedGymCoreSyncEnv',
+    max_episode_steps=500,
     tags={
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
-        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'gym_core_id': 'CartPole-v0',
@@ -145,11 +145,11 @@ register(
 register(
     id='gym-core.CartPoleLowD-v0',
     entry_point='universe.wrappers:WrappedGymCoreEnv',
+    max_episode_steps=500,
     tags={
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
-        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'rewarder_observation': True,
@@ -161,11 +161,11 @@ register(
 register(
     id='gym-core.CartPole-v0',
     entry_point='universe.wrappers:WrappedGymCoreEnv',
+    max_episode_steps=500,
     tags={
         'vnc': True,
         'runtime': 'gym-core',
         'metadata_encoding': metadata_pixels,
-        'wrapper_config.TimeLimit.max_episode_steps': 500,
     },
     kwargs={
         'gym_core_id': 'CartPole-v0',
@@ -195,11 +195,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}'.format(gym_core_id),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=100000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -210,11 +210,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}Sync-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreSyncEnv',
+            max_episode_steps=100000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -225,11 +225,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}30FPS-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=100000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -241,11 +241,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}Slow-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=100000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -259,11 +259,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}Deterministic-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=100000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 100000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -273,11 +273,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}DeterministicSlow-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=75000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 75000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -288,11 +288,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}DeterministicSync-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreSyncEnv',
+            max_episode_steps=75000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 75000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -304,11 +304,11 @@ for game in ['air_raid', 'alien', 'amidar', 'assault', 'asterix',
         register(
             id='gym-core.{}NoFrameskip-v{}'.format(base, version),
             entry_point='universe.wrappers:WrappedGymCoreEnv',
+            max_episode_steps=400000,
             tags={
                 'vnc': True,
                 'atari': True,
                 'runtime': 'gym-core',
-                'wrapper_config.TimeLimit.max_episode_steps': 400000,
                 'metadata_encoding': metadata_pixels,
             },
             kwargs={
@@ -1456,11 +1456,11 @@ for game in [
     register(
         id=game,
         entry_point='universe.wrappers:WrappedFlashgamesEnv',
+        max_episode_steps=20000,
         tags={
             'vnc': True,
             'flashgames': True,
             'runtime': 'flashgames',
-            'wrapper_config.TimeLimit.max_episode_steps': 20000,
             'metadata_encoding': metadata_v1,
             'action_probe': {
                 'type': 'key',
@@ -1472,11 +1472,11 @@ for game in [
 register(
     id='VNCNoopFlashgamesEnv-v0',  # Special noop flashgame env
     entry_point='universe.vnc:WrappedFlashgamesEnv',
+    max_episode_steps=10**7,
     tags={
         'vnc': True,
         'flashgames': True,
         'runtime': 'flashgames',
-        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
     },
 )
 
@@ -1591,11 +1591,11 @@ for game in vnc_world_of_bits:
     register(
         id=game,
         entry_point='universe.wrappers:WrappedVNCEnv',
+        max_episode_steps=10**7,
         tags={
             'vnc': True,
             'wob': True,
             'runtime': 'world-of-bits',
-            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
     )
 
@@ -1612,11 +1612,11 @@ for id in ['starcraft.TerranAstralBalance-v0']:
     register(
         id=id,
         entry_point='universe.wrappers:WrappedStarCraftEnv',
+        max_episode_steps=10**7,
         tags={
             'vnc': True,
             'starcraft': True,
             'runtime': 'starcraft',
-            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
     )
 
@@ -1624,22 +1624,22 @@ for gtav_game in ['gtav.SaneDriving-v0', 'gtav.Speed-v0']:
     register(
         id=gtav_game,
         entry_point='universe.wrappers:WrappedGTAVEnv',
+        max_episode_steps=10**7,
         tags={
             'vnc': True,
             'gtav': True,
             'runtime': 'vnc-windows',
-            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         },
     )
 
 register(
     id='world.WorldOfGoo-v0',
     entry_point='universe.wrappers:WrappedWorldOfGooEnv',
+    max_episode_steps=10**7,
     tags={
         'vnc': True,
         'wog': True,
         'runtime': 'vnc-world-of-goo',
-        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
     },
 )
 
@@ -1647,11 +1647,11 @@ for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
     register(
         id='internet.' + slith_game,
         entry_point='universe.wrappers:WrappedInternetEnv',
+        max_episode_steps=10**7,
         tags={
             'vnc': True,
             'internet': True,
             'slither': True,
-            'wrapper_config.TimeLimit.max_episode_steps': 10**7,
             'runtime': 'flashgames',
             'metadata_encoding': metadata_v1,
             'action_probe': {
@@ -1664,10 +1664,10 @@ for slith_game in ['SlitherIO-v0', 'SlitherIONoSkins-v0', 'SlitherIOEasy-v0']:
 register(
     id='test.DummyVNCEnv-v0',
     entry_point='universe.envs:DummyVNCEnv',
+    max_episode_steps= 10**7,
     tags={
         'vnc': True,
         'metadata_encoding': metadata_v1,
-        'wrapper_config.TimeLimit.max_episode_steps': 10**7,
         'action_probe': {
             'type': 'key',
             'value': 0x60,

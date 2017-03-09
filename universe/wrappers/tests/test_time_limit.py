@@ -7,18 +7,18 @@ from universe import wrappers
 register(
     id='test.SecondsLimitDummyVNCEnv-v0',
     entry_point='universe.envs:DummyVNCEnv',
+    max_episode_seconds=0.1,
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit.max_episode_seconds': 0.1
         }
     )
 
 register(
     id='test.StepsLimitDummyVNCEnv-v0',
     entry_point='universe.envs:DummyVNCEnv',
+    max_episode_steps=2,
     tags={
         'vnc': True,
-        'wrapper_config.TimeLimit.max_episode_steps': 2
         }
     )
 

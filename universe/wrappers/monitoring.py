@@ -33,7 +33,6 @@ class _UniverseMonitor(core.Wrapper):
         self._unvectorized_envs = [wrappers.WeakUnvectorize(self.env, i) for i in range(1)]
 
         # For now we only monitor the first env
-
         if hasattr(gym, 'wrappers'):
             self._monitor = gym.wrappers.Monitor(self._unvectorized_envs[0],
                 directory=self.directory,
