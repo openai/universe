@@ -40,6 +40,9 @@ class Wrapper(Env, gym.Wrapper):
     def n(self):
         return self.env.n
 
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
+
 class ObservationWrapper(Wrapper, gym.ObservationWrapper):
     pass
 

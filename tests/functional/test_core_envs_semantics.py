@@ -90,9 +90,10 @@ def test_nice_vnc_semantics_match(spec, matcher, wrapper):
     spaces.seed(0)
 
     vnc_env = spec.make()
+    if vnc_env.metadata.get('configure.required', False):
+        vnc_env.configure(remotes=1)
     vnc_env = wrapper(vnc_env)
     vnc_env = wrappers.Unvectorize(vnc_env)
-    vnc_env.configure(remotes=1)
 
     env = gym.make(spec._kwargs['gym_core_id'])
 

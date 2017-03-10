@@ -4,9 +4,6 @@ from universe import error, rewarder, vectorized
 class Joint(vectorized.Wrapper):
     def __init__(self, env_m):
         self.env_m = env_m
-        for env in self.env_m:
-            if not env._configured:
-                raise error.Error('Joint env should have been initialized: {}'.format(env))
 
         # TODO: generalize this. Doing so requires adding a vectorized
         # space mode.
@@ -15,9 +12,13 @@ class Joint(vectorized.Wrapper):
 
         self.pool = pool.ThreadPool(min(len(env_m), 5))
 
-        self.n = sum(env.n for env in self.env_m)
+        self._n = sum(env.n for env in self.env_m)
         self.metadata = self.metadata.copy()
         self.metadata['render.modes'] = self.env_m[0].metadata['render.modes']
+
+    @property
+    def n(self):
+        return self._n
 
     def _close(self):
         if hasattr(self, 'pool'):

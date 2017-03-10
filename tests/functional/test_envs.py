@@ -26,12 +26,13 @@ def test_smoke(env_id):
     logging.getLogger().setLevel(logging.INFO)
 
     env = gym.make(env_id)
-    env = wrappers.Unvectorize(env)
+    if env.metadata.get('configure.required', False):
+        if os.environ.get('FORCE_LATEST_UNIVERSE_DOCKER_RUNTIMES'):  # Used to test universe-envs in CI
+            configure_with_latest_docker_runtime_tag(env)
+        else:
+            env.configure(remotes=1)
 
-    if os.environ.get('FORCE_LATEST_UNIVERSE_DOCKER_RUNTIMES'):  # Used to test universe-envs in CI
-        configure_with_latest_docker_runtime_tag(env)
-    else:
-        env.configure(remotes=1)
+    env = wrappers.Unvectorize(env)
 
     env.reset()
     _rollout(env, timestep_limit=60*30) # Check a rollout

@@ -30,8 +30,13 @@ class Logger(vectorized.Wrapper):
         super(Logger, self).__init__(env)
         self.print_frequency = print_frequency
         extra_logger.info('Running VNC environments with Logger set to print_frequency=%s. To change this, pass "print_frequency=k" or "print_frequency=None" to "env.configure".', self.print_frequency)
-        self._clear_step_state()
+        if self.n is not None:
+            self._clear_step_state()
         self._last_step_time = None
+
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
+        self._clear_step_state()
 
     def _clear_step_state(self):
         self.frames = 0

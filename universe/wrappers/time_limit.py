@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 DEFAULT_MAX_EPISODE_SECONDS = 20 * 60.  # Default to 20 minutes if there is no explicit limit
 
 class UniverseTimeLimit(core.Wrapper):
-    def __init__(self):
-        super(UniverseTimeLimit, self).__init__()
+    def __init__(self, env):
+        super(UniverseTimeLimit, self).__init__(env)
         self._max_episode_seconds = self.env.spec.max_episode_seconds
         self._max_episode_steps = self.env.spec.max_episode_steps
 

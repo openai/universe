@@ -37,7 +37,8 @@ class EpisodeID(vectorized.Wrapper):
 For each episode, return its id, and also return the total number of contiguous
 episodes that are now done.
 """
-    def configure(self, episode_limit=None):
+    def configure(self, episode_limit=None, **kwargs):
+        self.env.configure(**kwargs)
         self.episode_limit = episode_limit
         self._clear_state()
 
