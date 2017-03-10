@@ -135,18 +135,18 @@ class VNCEnv(vectorized.Env):
         self._seed_value = seed
         return [seed]
 
-    def _configure(self, remotes=None,
-                   client_id=None,
-                   start_timeout=None, docker_image=None,
-                   ignore_clock_skew=False, disable_action_probes=False,
-                   vnc_driver=None, vnc_kwargs=None,
-                   rewarder_driver=None,
-                   replace_on_crash=False, allocate_sync=True,
-                   observer=False, api_key=None,
-                   record=False,
-                   sample_env_ids=None,
+    def configure(self, remotes=None,
+                  client_id=None,
+                  start_timeout=None, docker_image=None,
+                  ignore_clock_skew=False, disable_action_probes=False,
+                  vnc_driver=None, vnc_kwargs=None,
+                  rewarder_driver=None,
+                  replace_on_crash=False, allocate_sync=True,
+                  observer=False, api_key=None,
+                  record=False,
+                  sample_env_ids=None,
     ):
-        """Standard Gym hook to configure the environment.
+        """Universe method to configure the environment.
 
         Args:
 
@@ -552,7 +552,11 @@ class VNCEnv(vectorized.Env):
                 self.vnc_session.render(self.connection_names[0])
 
     def __str__(self):
-        return 'VNCEnv<{}>'.format(self.spec.id)
+        if self.spec:
+            return '<VNCEnv{}>'.format(self.spec.id)
+        else:
+            return 'VNCEnv'
+
 
 class Mask(object):
     """Blocks the agent from interacting with the environment while the

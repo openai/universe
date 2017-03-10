@@ -21,8 +21,8 @@ class VectorizeFilter(core.Wrapper):
         self._args = args
         self._kwargs = kwargs
 
-    def _configure(self, **kwargs):
-        super(VectorizeFilter, self)._configure(**kwargs)
+    def configure(self, **kwargs):
+        super(VectorizeFilter, self).configure(**kwargs)
         self.filter_n = [self.filter_factory(*self._args, **self._kwargs) for _ in range(self.n)]
 
     def _reset(self):

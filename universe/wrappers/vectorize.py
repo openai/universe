@@ -33,17 +33,13 @@ rather than a list of observations), turn it into a vectorized environment with 
 class Unvectorize(core.Wrapper):
     """
 Take a vectorized environment with a batch of size 1 and turn it into an unvectorized environment.
-""" 
+"""
     autovectorize = False
     metadata = {'runtime.vectorized': False}
 
-    def _configure(self, **kwargs):
-        super(Unvectorize, self)._configure(**kwargs)
-        if self.n != 1:
-            raise error.Error('Can only disable vectorization with n=1, not n={}'.format(self.n))
-
     def _reset(self):
         observation_n = self.env.reset()
+        assert(len(observation_n) == 1)
         return observation_n[0]
 
     def _step(self, action):

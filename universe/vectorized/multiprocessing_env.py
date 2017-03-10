@@ -261,6 +261,7 @@ def close_n(worker_n):
 class MultiprocessingEnv(core.Env):
     metadata = {
         'runtime.vectorized': True,
+        'configure.required': True,
     }
 
     def __init__(self, env_id):
@@ -278,8 +279,7 @@ class MultiprocessingEnv(core.Env):
         self.observation_space = env.observation_space
         self.reward_range = env.reward_range
 
-    def _configure(self, n=1, pool_size=None, episode_limit=None):
-        super(MultiprocessingEnv, self)._configure()
+    def configure(self, n=1, pool_size=None, episode_limit=None):
         self.n = n
         self.envs = [self.spec.make() for _ in range(self.n)]
 

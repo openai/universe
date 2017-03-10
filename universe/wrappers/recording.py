@@ -16,9 +16,11 @@ class Recording(vectorized.Wrapper):
     """
 Record all action/observation/reward/info to a log file.
 
-It will do nothing, unless configured with a (recording_dir='/path/to/results') argument.
-Configure also takes recording_poli
-You can also set recording_polcy='always'
+It will do nothing, unless given a (recording_dir='/path/to/results') argument.
+It also takes recording_policy:
+    'capped_cubic' will record a subset of episodes (those that are a perfect cube: 0, 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000, and every multiple of 1000 thereafter).
+    'always' records all
+    'never' records none
 
 The format is line-separated json, with large observations stored separately in binary.
 
@@ -28,28 +30,24 @@ for examining traces.
 """
 
     def __init__(self, env):
+        """
+        Configure the wrapper. To make it record, configure the env with
+        env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
+
+        """
         super(Recording, self).__init__(env)
         self._log_n = None
         self._episode_ids = None
         self._step_ids = None
         self._episode_id_counter = 0
-        self._recording_notes = None
-        self._recording_dir = None
-        self._recording_policy = lambda episode_id: False
         self._env_semantics_autoreset = env.metadata.get('semantics.autoreset', False)
+        self._async_write = False
+        self._recording_dir = None
+        self._recording_policy = None
+        self._recording_notes = None
 
-    def _configure(self, recording_dir=None, recording_policy=None, recording_notes={}, **kwargs):
-        """
-Configure the wrapper. To make it record, configure the env with
-env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
-  recording_dir:
-    It will create files 'universe.recording.*.{jsonl|bin}' in that directory
-  recording_policy:
-    'capped_cubic' will record a subset of episodes (those that are a perfect cube: 0, 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000, and every multiple of 1000 thereafter).
-    'always' records all
-    'never' records none
-
-"""
+    def configure(self, recording_dir=None, recording_policy=None, recording_notes={}):
+        self._configured = True
         self._recording_dir = recording_dir
         if self._recording_dir is not None:
             if recording_policy == 'never' or recording_policy is False:
@@ -64,14 +62,16 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
             self._recording_policy = lambda episode_id: False
         logger.info('Running Recording wrapper with recording_dir=%s policy=%s. To change this, pass recording_dir="..." to env.configure.', self._recording_dir, recording_policy)
 
-        self._recording_notes = recording_notes
+        self._recording_notes = {
+            'env_id': self.unwrapped.spec.id,
+        }
+        if recording_notes is not None:
+            self._recording_notes.update(recording_notes)
 
-        super(Recording, self)._configure(**kwargs)
+        if self.unwrapped.spec.tags.get('vnc', False):
+            self._async_write = True
         if self._recording_dir is not None:
             os.makedirs(self._recording_dir, exist_ok=True)
-        self._episode_ids = [self._get_episode_id() for i in range(self.n)]
-        self._step_ids = [0] * self.n
-
 
         self._instance_id = random_alphanumeric(6)
 
@@ -90,7 +90,7 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
         if self._log_n is None:
             self._log_n = [None] * self.n
         if self._log_n[i] is None:
-            self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i)
+            self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i, async_write=self._async_write)
         return self._log_n[i]
 
     def _reset(self):
@@ -101,6 +101,8 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
                     writer(type='notes', notes=self._recording_notes)
                     self._recording_notes = None
                 writer(type='reset', timestamp=time.time())
+            self._episode_ids[i] = self._get_episode_id()
+            self._step_ids[i] = 0
 
         return self.env.reset()
 

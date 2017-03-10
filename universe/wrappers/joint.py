@@ -15,25 +15,16 @@ class Joint(vectorized.Wrapper):
 
         self.pool = pool.ThreadPool(min(len(env_m), 5))
 
+        self.n = sum(env.n for env in self.env_m)
+        self.metadata = self.metadata.copy()
+        self.metadata['render.modes'] = self.env_m[0].metadata['render.modes']
+
     def _close(self):
         if hasattr(self, 'pool'):
             self.pool.close()
 
-    @property
-    def spec(self):
-        return None
-
-    @spec.setter
-    def spec(self, value):
-        pass
-
     def _render(self, mode='human', close=False):
         return self.env_m[0]._render(mode=mode, close=close)
-
-    def _configure(self, **kwargs):
-        self.n = sum(env.n for env in self.env_m)
-        self.metadata = self.metadata.copy()
-        self.metadata['render.modes'] = self.env_m[0].metadata['render.modes']
 
     def _reset(self):
         # Keep all env[0] action on the main thread, in case we ever
