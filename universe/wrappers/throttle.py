@@ -29,6 +29,7 @@ class Throttle(vectorized.Wrapper):
         self.fps = fps
         self.skip_metadata = skip_metadata
 
+        self.env.configure(**kwargs)
         self.diagnostics = self.unwrapped.diagnostics
 
     def _reset(self):

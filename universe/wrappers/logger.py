@@ -26,15 +26,11 @@ class Logger(vectorized.Wrapper):
     metadata = {
         'configure.required': True
     }
-    def __init__(self, env):
+    def __init__(self, env, print_frequency=5):
         super(Logger, self).__init__(env)
-
-    def configure(self, print_frequency=5):
         self.print_frequency = print_frequency
         extra_logger.info('Running VNC environments with Logger set to print_frequency=%s. To change this, pass "print_frequency=k" or "print_frequency=None" to "env.configure".', self.print_frequency)
         self._clear_step_state()
-        self.metadata['render.modes'] = self.env.metadata['render.modes']
-
         self._last_step_time = None
 
     def _clear_step_state(self):

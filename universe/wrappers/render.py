@@ -17,6 +17,8 @@ class Render(vectorized.Wrapper):
         self._observation = None
         super(Render, self).__init__(*args, **kwargs)
 
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
         self.metadata = self.metadata.copy()
         modes = self.metadata.setdefault('render.modes', [])
         if 'rgb_array' not in modes:
