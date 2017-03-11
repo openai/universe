@@ -30,14 +30,15 @@ for examining logs.
 
 """
 
-    def __init__(self, env, recording_dir=None, recording_policy=None, recording_notes={}):
+    def __init__(self, env, recording_dir=None, recording_policy=None, recording_notes=None):
         super(Recording, self).__init__(env)
         self._log_n = None
         self._episode_ids = None
         self._step_ids = None
         self._episode_id_counter = 0
         self._env_semantics_autoreset = env.metadata.get('semantics.autoreset', False)
-        self._async_write = False
+        self._env_semantics_async = env.metadata.get('semantics.async', False)
+        self._async_write = self._env_semantics_async
 
         self._recording_dir = recording_dir
         if self._recording_dir is not None:
@@ -54,13 +55,15 @@ for examining logs.
         logger.info('Running Recording wrapper with recording_dir=%s policy=%s. To change this, pass recording_dir="..." to env.configure.', self._recording_dir, recording_policy)
 
         self._recording_notes = {
-            'env_id': self.unwrapped.spec.id,
+            'env_id': env.spec.id,
+            'env_metadata': env.metadata,
+            'env_spec_tags': env.spec.tags,
+            'env_semantics_async': self._env_semantics_async,
+            'env_semantics_autoreset': self._env_semantics_autoreset,
         }
         if recording_notes is not None:
             self._recording_notes.update(recording_notes)
 
-        if self.unwrapped.spec.tags.get('vnc', False):
-            self._async_write = True
         if self._recording_dir is not None:
             os.makedirs(self._recording_dir, exist_ok=True)
 
