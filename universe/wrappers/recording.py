@@ -17,24 +17,20 @@ class Recording(vectorized.Wrapper):
 Record all action/observation/reward/info to a log file.
 
 It will do nothing, unless given a (recording_dir='/path/to/results') argument.
-It also takes recording_policy:
+recording_policy can be one of:
     'capped_cubic' will record a subset of episodes (those that are a perfect cube: 0, 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000, and every multiple of 1000 thereafter).
     'always' records all
     'never' records none
+recording_notes can be used to record hyperparameters in the log file
 
 The format is line-separated json, with large observations stored separately in binary.
 
 The universe-viewer project (http://github.com/openai/universe-viewer) provides a browser-based UI
-for examining traces.
+for examining logs.
 
 """
 
-    def __init__(self, env):
-        """
-        Configure the wrapper. To make it record, configure the env with
-        env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
-
-        """
+    def __init__(self, env, recording_dir=None, recording_policy=None, recording_notes={}):
         super(Recording, self).__init__(env)
         self._log_n = None
         self._episode_ids = None
@@ -42,12 +38,7 @@ for examining traces.
         self._episode_id_counter = 0
         self._env_semantics_autoreset = env.metadata.get('semantics.autoreset', False)
         self._async_write = False
-        self._recording_dir = None
-        self._recording_policy = None
-        self._recording_notes = None
 
-    def configure(self, recording_dir=None, recording_policy=None, recording_notes={}):
-        self._configured = True
         self._recording_dir = recording_dir
         if self._recording_dir is not None:
             if recording_policy == 'never' or recording_policy is False:
@@ -94,6 +85,11 @@ for examining traces.
         return self._log_n[i]
 
     def _reset(self):
+        if self._episode_ids is None:
+            self._episode_ids = [None] * self.n
+        if self._step_ids is None:
+            self._step_ids = [None] * self.n
+
         for i in range(self.n):
             writer = self._get_writer(i)
             if writer is not None:
