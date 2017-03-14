@@ -22,8 +22,8 @@ class GymCoreSync(vectorized.Wrapper):
         # Metadata has already been cloned
         self.metadata['semantics.async'] = False
 
-    def _reset(self):
-        observation_n = self.env.reset()
+    def _reset(self, **kwargs):
+        observation_n = self.env.reset(**kwargs)
         new_observation_n, self.reward_n, self.done_n, self.info = self.env.step([[] for i in range(self.n)])
         rewarder.merge_observation_n(observation_n, new_observation_n)
 

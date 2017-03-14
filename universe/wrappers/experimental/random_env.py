@@ -17,8 +17,8 @@ class RandomEnv(vectorized.Wrapper):
     def configure(self, **kwargs):
         super(RandomEnv, self).configure(sample_env_ids=self.env_ids, **kwargs)
 
-    def _reset(self):
-        observation_n = self.env.reset()
+    def _reset(self, **kwargs):
+        observation_n = self.env.reset(**kwargs)
         return [ob['vision'] if ob is not None else ob for ob in observation_n]
 
     def _step(self, action_n):

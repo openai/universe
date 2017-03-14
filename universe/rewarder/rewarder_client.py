@@ -28,19 +28,23 @@ class RewarderClient(websocket.WebSocketClientProtocol):
 
         self._connection_result = defer.Deferred()
 
-    def send_reset(self, env_id, seed, fps, episode_id):
+    def send_reset(self, env_id, seed, fps, episode_id, **kwargs):
         self._initial_reset = True
         self._reset = {
             'env_id': env_id,
             'fps': fps,
             'episode_id': episode_id,
         }
+        self._reset.update(kwargs)
 
-        return self.send('v0.env.reset', {
+        header = {
             'seed': seed,
             'env_id': env_id,
             'fps': fps,
-        }, {'episode_id': episode_id}, expect_reply=True)
+        }
+        header.update(kwargs)
+
+        return self.send('v0.env.reset', header, {'episode_id': episode_id}, expect_reply=True)
 
     def _finish_reset(self, episode_id):
         extra_logger.info('[%s] Running finish_reset: %s', self.factory.label, episode_id)

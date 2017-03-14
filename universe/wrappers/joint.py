@@ -27,12 +27,12 @@ class Joint(vectorized.Wrapper):
     def _render(self, mode='human', close=False):
         return self.env_m[0]._render(mode=mode, close=close)
 
-    def _reset(self):
+    def reset(self, **kwargs):
         # Keep all env[0] action on the main thread, in case we ever
         # need to render. Otherwise we get segfaults from the
         # go-vncdriver.
-        reset_m_async = self.pool.map_async(lambda env: env.reset(), self.env_m[1:])
-        reset = self.env_m[0].reset()
+        reset_m_async = self.pool.map_async(lambda env: env.reset(**kwargs), self.env_m[1:])
+        reset = self.env_m[0].reset(**kwargs)
         reset_m = [reset] + reset_m_async.get()
 
         observation_n = []

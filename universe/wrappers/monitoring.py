@@ -63,9 +63,9 @@ class _UniverseMonitor(core.Wrapper):
         done_n[0] = self._monitor._after_step(observation_n[0], reward_n[0], done_n[0], info)
         return observation_n, reward_n, done_n, info
 
-    def _reset(self):
+    def _reset(self, **kwargs):
         self._monitor._before_reset()
-        observation_n = self.env.reset()
+        observation_n = self.env.reset(**kwargs)
         self._monitor._after_reset(observation_n[0])
         return observation_n
 

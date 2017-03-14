@@ -87,23 +87,11 @@ for examining logs.
             self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i, async_write=self._async_write)
         return self._log_n[i]
 
-    def _reset(self):
+    def reset(self, **kwargs):
         if self._episode_ids is None:
             self._episode_ids = [None] * self.n
         if self._step_ids is None:
             self._step_ids = [None] * self.n
-
-        for i in range(self.n):
-            writer = self._get_writer(i)
-            if writer is not None:
-                if self._recording_notes is not None:
-                    writer(type='notes', notes=self._recording_notes)
-                    self._recording_notes = None
-                writer(type='reset', timestamp=time.time())
-            self._episode_ids[i] = self._get_episode_id()
-            self._step_ids[i] = 0
-
-        return self.env.reset()
 
     def _step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)

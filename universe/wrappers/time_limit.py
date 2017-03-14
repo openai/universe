@@ -47,8 +47,8 @@ class UniverseTimeLimit(core.Wrapper):
 
         return observation_n, reward_n, done_n, info
 
-    def _reset(self):
+    def _reset(self, **kwargs):
         self._episode_started_at = time.time()
         self._elapsed_steps = 0
-        return self.env.reset()
+        return self.env.reset(**kwargs)
 TimeLimit = UniverseTimeLimit

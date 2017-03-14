@@ -332,7 +332,7 @@ class VNCEnv(vectorized.Env):
             if hasattr(self, 'remotes_manager') and self._remotes_manager:
                 self._remotes_manager.close()
 
-    def _reset(self):
+    def _reset(self, **kwargs):
         self._handle_connect()
 
         if self.rewarder_session:
@@ -341,7 +341,7 @@ class VNCEnv(vectorized.Env):
                 logger.info("Randomly sampled env_id={}".format(env_id))
             else:
                 env_id = None
-            self.rewarder_session.reset(env_id=env_id)
+            self.rewarder_session.reset(seed=None, env_id=env_id, **kwargs)
         else:
             logger.info("No rewarder session exists, so cannot send a reset via the rewarder channel")
         self._reset_mask()

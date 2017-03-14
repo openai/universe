@@ -80,8 +80,8 @@ class Worker(object):
     def close_finish(self):
         self.joiner.join()
 
-    def reset_start(self):
-        self._parent_send(('reset', None))
+    def reset_start(self, **kwargs):
+        self._parent_send(('reset', kwargs))
 
     def reset_finish(self):
         return self._parent_recv()
@@ -125,8 +125,9 @@ class Worker(object):
                 # TODO: close envs?
                 return
             elif method == 'reset':
+                kwargs = body
                 self._clear_state()
-                observation_m = [env.reset() for env in self.env_m]
+                observation_m = [env.reset(**kwargs) for env in self.env_m]
                 self._child_send(observation_m)
             elif method == 'step':
                 action_m = body
@@ -196,9 +197,9 @@ def step_n(worker_n, action_n):
     return observation_n, reward_n, done_n, info
 
 
-def reset_n(worker_n):
+def reset_n(worker_n, **kwargs):
     for worker in worker_n:
-        worker.reset_start()
+        worker.reset_start(**kwargs)
 
     observation_n = []
     for worker in worker_n:
@@ -300,8 +301,8 @@ class MultiprocessingEnv(core.Env):
         seed_n(self.worker_n, seed)
         return [[seed_i] for seed_i in seed]
 
-    def _reset(self):
-        return reset_n(self.worker_n)
+    def _reset(self, **kwargs):
+        return reset_n(self.worker_n, **kwargs)
 
     def _step(self, action_n):
         return step_n(self.worker_n, action_n)

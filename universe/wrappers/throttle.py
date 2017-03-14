@@ -32,14 +32,14 @@ class Throttle(vectorized.Wrapper):
         self.env.configure(**kwargs)
         self.diagnostics = self.unwrapped.diagnostics
 
-    def _reset(self):
+    def _reset(self, **kwargs):
         # We avoid aggregating reward/info across episode boundaries
         # by caching it on the object
         self._deferred_reward_n = None
         self._deferred_done_n = None
         self._deferred_info_n = None
 
-        observation = self.env.reset()
+        observation = self.env.reset(**kwargs)
         self._start_timer()
         return observation
 

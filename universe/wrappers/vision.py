@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 class Vision(vectorized.Wrapper):
     """
-At present, an observation from a vectorized universe environment returns a list of 
+At present, an observation from a vectorized universe environment returns a list of
 dicts. Each dict contains input data for each modality.  Modalities include 'vision'
 and 'text', and it is possible to add other modalities in the future (such as 'audio').
 
@@ -13,8 +13,8 @@ The Vision wrapper extracts the vision modality and discards all others.  This i
 when we only care about the visual input.
 """
 
-    def _reset(self):
-        observation_n = self.env.reset()
+    def _reset(self, **kwargs):
+        observation_n = self.env.reset(**kwargs)
         return [ob['vision'] if ob is not None else ob for ob in observation_n]
 
     def _step(self, action_n):

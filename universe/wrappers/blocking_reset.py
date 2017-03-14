@@ -2,8 +2,8 @@ from universe import rewarder, spaces, vectorized
 
 class BlockingReset(vectorized.Wrapper):
     """
-By default, a reset in universe is not a blocking operation.  This 
-wrapper changes it. 
+By default, a reset in universe is not a blocking operation.  This
+wrapper changes it.
 """
 
     def __init__(self, *args, **kwargs):
@@ -12,8 +12,8 @@ wrapper changes it.
         self.done_n = None
         self.info = None
 
-    def _reset(self):
-        observation_n = self.env.reset()
+    def _reset(self, **kwargs):
+        observation_n = self.env.reset(**kwargs)
         self.reward_n = [0] * self.n
         self.done_n = [False] * self.n
         self.info = {'n': [{} for _ in range(self.n)]}
