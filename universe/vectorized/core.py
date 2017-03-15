@@ -43,6 +43,9 @@ class Wrapper(Env, gym.Wrapper):
     def configure(self, **kwargs):
         self.env.configure(**kwargs)
 
+    def reset(self, **kwargs):
+        self._reset(**kwargs)
+
 class ObservationWrapper(Wrapper, gym.ObservationWrapper):
     pass
 

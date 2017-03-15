@@ -332,7 +332,7 @@ class VNCEnv(vectorized.Env):
             if hasattr(self, 'remotes_manager') and self._remotes_manager:
                 self._remotes_manager.close()
 
-    def _reset(self, **kwargs):
+    def reset(self, **kwargs):
         self._handle_connect()
 
         if self.rewarder_session:
