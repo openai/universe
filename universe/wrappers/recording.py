@@ -140,6 +140,9 @@ for examining logs.
                     self._log_n[i] = None
 
 class RecordingWriter(object):
+    """
+    Safe to use from multiple threads, in case your agent action generator & learning are running in parallel.
+    """
     def __init__(self, recording_dir, instance_id, channel_id, async_write=True):
         self.log_fn = 'universe.recording.{}.{}.{}.jsonl'.format(os.getpid(), instance_id, channel_id)
         log_path = os.path.join(recording_dir, self.log_fn)
@@ -148,18 +151,13 @@ class RecordingWriter(object):
         extra_logger.info('Logging to %s and %s', log_path, self.bin_fn)
         self.log_f = open(log_path, 'w')
         self.bin_f = open(bin_path, 'wb')
-        self.async_write = async_write
-        if self.async_write:
-            self.q = queue.Queue()
-            self.t = threading.Thread(target=self.writer_main)
-            self.t.start()
+        # It would be better to measure memory use and block the writer when the queue is sitting on too much memory
+        self.q = queue.Queue(1000)
+        self.t = threading.Thread(target=self.writer_main)
+        self.t.start()
 
     def close(self):
-        if self.async_write:
-            self.q.put(None)
-            self.t.join()
-        else:
-            self.close_files()
+        self.q.put(None)
 
     def close_files(self):
         if self.bin_f is not None:
@@ -200,11 +198,8 @@ class RecordingWriter(object):
         self.close_files()
 
     def __call__(self, **kwargs):
-        if self.async_write:
-            pyprofile.gauge('recording.qsize', self.q.qsize())
-            self.q.put(kwargs)
-        else:
-            self.write_item(kwargs)
+        pyprofile.gauge('recording.qsize', self.q.qsize())
+        self.q.put(kwargs)
 
     def write_item(self, item):
         with pyprofile.push('recording.write'):
