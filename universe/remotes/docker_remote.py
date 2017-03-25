@@ -106,7 +106,7 @@ class DockerManager(object):
         healthcheck.run(
             ['{}:{}'.format(instance.assigner.info['host'], instance.vnc_port) for instance in instances],
             ['{}:{}'.format(instance.assigner.info['host'], instance.rewarder_port) for instance in instances],
-            start_timeout=30,
+            start_timeout=self.start_timeout
         )
 
 def get_client():

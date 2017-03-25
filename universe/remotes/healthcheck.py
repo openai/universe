@@ -25,7 +25,7 @@ def host_port(address, default_port=None):
 
 class Healthcheck(object):
     def __init__(self, vnc_addresses, rewarder_addresses, timeout=None, start_timeout=None):
-        self.timeout = timeout or (4 * len(vnc_addresses) + 20)
+        self.timeout = timeout or (20 * len(vnc_addresses) + 20)
         self.start_timeout = start_timeout
 
         start_time = time.time()
