@@ -15,11 +15,12 @@ class Env(gym.Env):
     # Number of remotes. User should set this.
     n = None
 
+
 class Wrapper(Env, gym.Wrapper):
     """Use this instead of gym.Wrapper iff you're wrapping a vectorized env,
     (or a vanilla env you wish to be vectorized).
     """
-    # If True and this is instantiated with a non-vectorized environment, 
+    # If True and this is instantiated with a non-vectorized environment,
     # automatically wrap it with the Vectorize wrapper.
     autovectorize = True
 
@@ -35,10 +36,12 @@ class Wrapper(Env, gym.Wrapper):
 
         self.env = env
 
-    def _configure(self, **kwargs):
-        super(Wrapper, self)._configure(**kwargs)
-        assert self.env.n is not None, "Did not set self.env.n: self.n={} self.env={} self={}".format(self.env.n, self.env, self)
-        self.n = self.env.n
+    @property
+    def n(self):
+        return self.env.n
+
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
 
 class ObservationWrapper(Wrapper, gym.ObservationWrapper):
     pass
@@ -48,4 +51,3 @@ class RewardWrapper(Wrapper, gym.RewardWrapper):
 
 class ActionWrapper(Wrapper, gym.ActionWrapper):
     pass
-

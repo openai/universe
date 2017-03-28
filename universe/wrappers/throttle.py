@@ -23,13 +23,13 @@ class Throttle(vectorized.Wrapper):
 
         self._steps = None
 
-    def _configure(self, skip_metadata=False, fps='default', **kwargs):
-        super(Throttle, self)._configure(**kwargs)
+    def configure(self, skip_metadata=False, fps='default', **kwargs):
         if fps == 'default':
             fps = self.metadata['video.frames_per_second']
         self.fps = fps
         self.skip_metadata = skip_metadata
 
+        self.env.configure(**kwargs)
         self.diagnostics = self.unwrapped.diagnostics
 
     def _reset(self):

@@ -6,9 +6,12 @@ logger = logging.getLogger(__name__)
 
 class Timer(vectorized.Wrapper):
     """
-Calcultae how much time was spent actually doing work.  Display result
+Calculate how much time was spent actually doing work.  Display result
 via pyprofile.
 """
+
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
 
     def _reset(self):
         with pyprofile.push('vnc_env.Timer.reset'):

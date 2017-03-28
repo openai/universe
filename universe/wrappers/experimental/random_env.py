@@ -14,8 +14,8 @@ class RandomEnv(vectorized.Wrapper):
         super(RandomEnv, self).__init__(env)
         self.env_ids = env_ids
 
-    def _configure(self, **kwargs):
-        super(RandomEnv, self)._configure(sample_env_ids=self.env_ids, **kwargs)
+    def configure(self, **kwargs):
+        super(RandomEnv, self).configure(sample_env_ids=self.env_ids, **kwargs)
 
     def _reset(self):
         observation_n = self.env.reset()

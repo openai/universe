@@ -30,13 +30,15 @@ class RemoveNones(vectorized.Wrapper):
         return observation_n, reward_n, done_n, info
 
 class EpisodeID(vectorized.Wrapper):
+    metadata = {
+        'configure.required': True
+    }
     """
-For each episode, return its id, and also return the total number of contiguous 
-episodes that are now done. 
+For each episode, return its id, and also return the total number of contiguous
+episodes that are now done.
 """
-    def _configure(self, episode_limit=None, **kwargs):
-        super(EpisodeID, self)._configure(**kwargs)
-        assert self.metadata.get('runtime.vectorized')
+    def configure(self, episode_limit=None, **kwargs):
+        self.env.configure(**kwargs)
         self.episode_limit = episode_limit
         self._clear_state()
 

@@ -13,7 +13,6 @@ def test_joint():
         reward_buffer.push('1', 10, False, {})
 
     env = wrappers.Joint([env1, env2])
-    env.configure()
     assert env.n == 6
     observation_n = env.reset()
     assert observation_n == [None] * 6
