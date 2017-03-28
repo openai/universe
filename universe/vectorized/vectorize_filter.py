@@ -18,14 +18,13 @@ class VectorizeFilter(core.Wrapper):
     def __init__(self, env, filter_factory, *args, **kwargs):
         super(VectorizeFilter, self).__init__(env)
         self.filter_factory = filter_factory
+        self.filter_n = None
         self._args = args
         self._kwargs = kwargs
 
-    def _configure(self, **kwargs):
-        super(VectorizeFilter, self)._configure(**kwargs)
-        self.filter_n = [self.filter_factory(*self._args, **self._kwargs) for _ in range(self.n)]
-
     def _reset(self):
+        if self.filter_n is None:
+            self.filter_n = [self.filter_factory(*self._args, **self._kwargs) for _ in range(self.n)]
         observation_n = self.env.reset()
         observation_n = [filter._after_reset(observation) for filter, observation in zip(self.filter_n, observation_n)]
         return observation_n

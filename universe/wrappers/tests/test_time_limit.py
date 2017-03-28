@@ -25,8 +25,8 @@ register(
 
 def test_steps_limit_restart():
     env = gym.make('test.StepsLimitDummyVNCEnv-v0')
-    env = wrappers.TimeLimit(env)
     env.configure(_n=1)
+    env = wrappers.TimeLimit(env)
     env.reset()
 
     assert env._max_episode_seconds == None
@@ -54,8 +54,8 @@ def test_steps_limit_restart_unused_when_not_wrapped():
 
 def test_seconds_limit_restart():
     env = gym.make('test.SecondsLimitDummyVNCEnv-v0')
-    env = wrappers.TimeLimit(env)
     env.configure(_n=1)
+    env = wrappers.TimeLimit(env)
     env.reset()
 
     assert env._max_episode_seconds == 0.1
@@ -87,8 +87,8 @@ def test_default_time_limit():
     )
 
     env = gym.make('test.NoLimitDummyVNCEnv-v0')
-    env = wrappers.TimeLimit(env)
     env.configure(_n=1)
+    env = wrappers.TimeLimit(env)
     env.reset()
 
     assert env._max_episode_seconds == wrappers.time_limit.DEFAULT_MAX_EPISODE_SECONDS

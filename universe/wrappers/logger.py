@@ -23,17 +23,20 @@ def stats(count):
     return s
 
 class Logger(vectorized.Wrapper):
-    def __init__(self, env):
+    metadata = {
+        'configure.required': True
+    }
+    def __init__(self, env, print_frequency=5):
         super(Logger, self).__init__(env)
-
-    def _configure(self, print_frequency=5, **kwargs):
         self.print_frequency = print_frequency
         extra_logger.info('Running VNC environments with Logger set to print_frequency=%s. To change this, pass "print_frequency=k" or "print_frequency=None" to "env.configure".', self.print_frequency)
-        super(Logger, self)._configure(**kwargs)
-        self._clear_step_state()
-        self.metadata['render.modes'] = self.env.metadata['render.modes']
-
+        if self.n is not None:
+            self._clear_step_state()
         self._last_step_time = None
+
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
+        self._clear_step_state()
 
     def _clear_step_state(self):
         self.frames = 0

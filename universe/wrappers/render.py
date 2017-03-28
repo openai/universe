@@ -6,6 +6,9 @@ from universe import vectorized
 logger = logging.getLogger(__name__)
 
 class Render(vectorized.Wrapper):
+    metadata = {
+        'configure.required': True
+    }
     def __init__(self, *args, **kwargs):
         if platform.isLinux() and not os.environ.get('DISPLAY'):
             self.renderable = False
@@ -14,8 +17,8 @@ class Render(vectorized.Wrapper):
         self._observation = None
         super(Render, self).__init__(*args, **kwargs)
 
-    def _configure(self, **kwargs):
-        super(Render, self)._configure(**kwargs)
+    def configure(self, **kwargs):
+        self.env.configure(**kwargs)
         self.metadata = self.metadata.copy()
         modes = self.metadata.setdefault('render.modes', [])
         if 'rgb_array' not in modes:

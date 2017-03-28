@@ -16,40 +16,30 @@ class Recording(vectorized.Wrapper):
     """
 Record all action/observation/reward/info to a log file.
 
-It will do nothing, unless configured with a (recording_dir='/path/to/results') argument.
-Configure also takes recording_poli
-You can also set recording_polcy='always'
+It will do nothing, unless given a (recording_dir='/path/to/results') argument.
+recording_policy can be one of:
+    'capped_cubic' will record a subset of episodes (those that are a perfect cube: 0, 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000, and every multiple of 1000 thereafter).
+    'always' records all
+    'never' records none
+recording_notes can be used to record hyperparameters in the log file
 
 The format is line-separated json, with large observations stored separately in binary.
 
 The universe-viewer project (http://github.com/openai/universe-viewer) provides a browser-based UI
-for examining traces.
+for examining logs.
 
 """
 
-    def __init__(self, env):
+    def __init__(self, env, recording_dir=None, recording_policy=None, recording_notes=None):
         super(Recording, self).__init__(env)
         self._log_n = None
         self._episode_ids = None
         self._step_ids = None
         self._episode_id_counter = 0
-        self._recording_notes = None
-        self._recording_dir = None
-        self._recording_policy = lambda episode_id: False
         self._env_semantics_autoreset = env.metadata.get('semantics.autoreset', False)
+        self._env_semantics_async = env.metadata.get('semantics.async', False)
+        self._async_write = self._env_semantics_async
 
-    def _configure(self, recording_dir=None, recording_policy=None, recording_notes={}, **kwargs):
-        """
-Configure the wrapper. To make it record, configure the env with
-env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
-  recording_dir:
-    It will create files 'universe.recording.*.{jsonl|bin}' in that directory
-  recording_policy:
-    'capped_cubic' will record a subset of episodes (those that are a perfect cube: 0, 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000, and every multiple of 1000 thereafter).
-    'always' records all
-    'never' records none
-
-"""
         self._recording_dir = recording_dir
         if self._recording_dir is not None:
             if recording_policy == 'never' or recording_policy is False:
@@ -64,14 +54,18 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
             self._recording_policy = lambda episode_id: False
         logger.info('Running Recording wrapper with recording_dir=%s policy=%s. To change this, pass recording_dir="..." to env.configure.', self._recording_dir, recording_policy)
 
-        self._recording_notes = recording_notes
+        self._recording_notes = {
+            'env_id': env.spec.id,
+            'env_metadata': env.metadata,
+            'env_spec_tags': env.spec.tags,
+            'env_semantics_async': self._env_semantics_async,
+            'env_semantics_autoreset': self._env_semantics_autoreset,
+        }
+        if recording_notes is not None:
+            self._recording_notes.update(recording_notes)
 
-        super(Recording, self)._configure(**kwargs)
         if self._recording_dir is not None:
             os.makedirs(self._recording_dir, exist_ok=True)
-        self._episode_ids = [self._get_episode_id() for i in range(self.n)]
-        self._step_ids = [0] * self.n
-
 
         self._instance_id = random_alphanumeric(6)
 
@@ -90,10 +84,15 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
         if self._log_n is None:
             self._log_n = [None] * self.n
         if self._log_n[i] is None:
-            self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i)
+            self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i, async_write=self._async_write)
         return self._log_n[i]
 
     def _reset(self):
+        if self._episode_ids is None:
+            self._episode_ids = [None] * self.n
+        if self._step_ids is None:
+            self._step_ids = [None] * self.n
+
         for i in range(self.n):
             writer = self._get_writer(i)
             if writer is not None:
@@ -101,6 +100,8 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
                     writer(type='notes', notes=self._recording_notes)
                     self._recording_notes = None
                 writer(type='reset', timestamp=time.time())
+            self._episode_ids[i] = self._get_episode_id()
+            self._step_ids[i] = 0
 
         return self.env.reset()
 
@@ -139,6 +140,9 @@ env.configure(recording_dir='/path/to/results', recording_policy='capped_cubic')
                     self._log_n[i] = None
 
 class RecordingWriter(object):
+    """
+    Safe to use from multiple threads, in case your agent action generator & learning are running in parallel.
+    """
     def __init__(self, recording_dir, instance_id, channel_id, async_write=True):
         self.log_fn = 'universe.recording.{}.{}.{}.jsonl'.format(os.getpid(), instance_id, channel_id)
         log_path = os.path.join(recording_dir, self.log_fn)
@@ -147,18 +151,13 @@ class RecordingWriter(object):
         extra_logger.info('Logging to %s and %s', log_path, self.bin_fn)
         self.log_f = open(log_path, 'w')
         self.bin_f = open(bin_path, 'wb')
-        self.async_write = async_write
-        if self.async_write:
-            self.q = queue.Queue()
-            self.t = threading.Thread(target=self.writer_main)
-            self.t.start()
+        # It would be better to measure memory use and block the writer when the queue is sitting on too much memory
+        self.q = queue.Queue(1000)
+        self.t = threading.Thread(target=self.writer_main)
+        self.t.start()
 
     def close(self):
-        if self.async_write:
-            self.q.put(None)
-            self.t.join()
-        else:
-            self.close_files()
+        self.q.put(None)
 
     def close_files(self):
         if self.bin_f is not None:
@@ -199,11 +198,8 @@ class RecordingWriter(object):
         self.close_files()
 
     def __call__(self, **kwargs):
-        if self.async_write:
-            pyprofile.gauge('recording.qsize', self.q.qsize())
-            self.q.put(kwargs)
-        else:
-            self.write_item(kwargs)
+        pyprofile.gauge('recording.qsize', self.q.qsize())
+        self.q.put(kwargs)
 
     def write_item(self, item):
         with pyprofile.push('recording.write'):
