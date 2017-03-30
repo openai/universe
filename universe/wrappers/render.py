@@ -24,7 +24,7 @@ class Render(vectorized.Wrapper):
         if 'rgb_array' not in modes:
             modes.append('rgb_array')
 
-    def _reset(self, **kwargs):
+    def reset(self, **kwargs):
         observation_n = self.env.reset(**kwargs)
         self._observation = observation_n[0]
         return observation_n

@@ -104,7 +104,7 @@ class GymCoreObservation(vectorized.Wrapper):
 
         self._gym_core_env = gym.spec(gym_core_id).make()
 
-    def _reset(self, **kwargs):
+    def reset(self, **kwargs):
         observation_n = self.env.reset(**kwargs)
         self.reward_n = [0] * self.n
         self.done_n = [False] * self.n

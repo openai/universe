@@ -19,7 +19,7 @@ rather than a list of observations), turn it into a vectorized environment with 
         assert self.metadata.get('runtime.vectorized')
         self.n = 1
 
-    def _reset(self, **kwargs):
+    def reset(self, **kwargs):
         observation = self.env.reset(**kwargs)
         return [observation]
 

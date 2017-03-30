@@ -13,7 +13,7 @@ The Vision wrapper extracts the vision modality and discards all others.  This i
 when we only care about the visual input.
 """
 
-    def _reset(self, **kwargs):
+    def reset(self, **kwargs):
         observation_n = self.env.reset(**kwargs)
         return [ob['vision'] if ob is not None else ob for ob in observation_n]
 
