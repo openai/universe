@@ -16,3 +16,5 @@ build/
 /.gitfiles
 /.tox
 /.cache
+__pycache__
+*.taghl
