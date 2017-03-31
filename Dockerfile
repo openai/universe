@@ -35,6 +35,9 @@ RUN pip install gym[all]
 # Get the faster VNC driver
 RUN pip install go-vncdriver>=0.4.0
 
+# Install pytest (for running test cases)
+RUN pip install pytest
+
 # Force the container to use the go vnc driver
 ENV UNIVERSE_VNCDRIVER='go'
 
@@ -48,3 +51,6 @@ RUN pip install -e .
 
 # Upload our actual code
 COPY . ./
+
+# Just in case any python cache files were carried over from the source directory, remove them
+RUN py3clean .
