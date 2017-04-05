@@ -21,7 +21,7 @@ setup(name='universe',
           'twisted>=16.5.0',
           'ujson>=1.35',
       ],
-      package_data={'universe': ['runtimes.yml']},
+      package_data={'universe': ['runtimes.yml', 'runtimes/flashgames.json']},
       tests_require=['pytest'],
       extras_require={
           'atari': 'gym[atari]',
