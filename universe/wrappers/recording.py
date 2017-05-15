@@ -94,14 +94,15 @@ for examining logs.
             self._step_ids = [None] * self.n
 
         for i in range(self.n):
-            writer = self._get_writer(i)
-            if writer is not None:
-                if self._recording_notes is not None:
-                    writer(type='notes', notes=self._recording_notes)
-                    self._recording_notes = None
-                writer(type='reset', timestamp=time.time())
             self._episode_ids[i] = self._get_episode_id()
             self._step_ids[i] = 0
+            if self._recording_policy(self._episode_ids[i]):
+                writer = self._get_writer(i)
+                if writer is not None:
+                    if self._recording_notes is not None:
+                        writer(type='notes', notes=self._recording_notes)
+                        self._recording_notes = None
+                    writer(type='reset', timestamp=time.time())
 
         return self.env.reset()
 
