@@ -134,15 +134,17 @@ class VNCEnv(vectorized.Env):
         self._seed_value = seed
         return [seed]
 
-    def _configure(self, remotes=None,
-                   client_id=None,
-                   start_timeout=None, docker_image=None,
-                   ignore_clock_skew=False, disable_action_probes=False,
-                   vnc_driver=None, vnc_kwargs=None,
-                   rewarder_driver=None,
-                   replace_on_crash=False, allocate_sync=True,
-                   observer=False, api_key=None,
-                   record=False,
+    def configure(self, remotes=None,
+                  client_id=None,
+                  start_timeout=None, docker_image=None,
+                  ignore_clock_skew=False, disable_action_probes=False,
+                  vnc_driver=None, vnc_kwargs=None,
+                  rewarder_driver=None,
+                  replace_on_crash=False, allocate_sync=True,
+                  observer=False, api_key=None,
+                  record=False,
+                  environment={},
+                  sample_env_ids=None,
     ):
         """Standard Gym hook to configure the environment.
 
@@ -178,6 +180,8 @@ class VNCEnv(vectorized.Env):
             if docker_image:
                 # TODO: don't support this option?
                 runtime.image = docker_image
+            if environment:
+                runtime.environment = environment
         else:
             runtime = None
 

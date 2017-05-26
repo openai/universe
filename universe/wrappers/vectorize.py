@@ -33,7 +33,7 @@ rather than a list of observations), turn it into a vectorized environment with 
 class Unvectorize(core.Wrapper):
     """
 Take a vectorized environment with a batch of size 1 and turn it into an unvectorized environment.
-""" 
+"""
     autovectorize = False
     metadata = {'runtime.vectorized': False}
 

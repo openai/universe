@@ -289,7 +289,7 @@ class DockerInstance(object):
         container = self.client.create_container(
             image=self.runtime.image,
             command=self.runtime.command,
-            # environment=self.runtime.environment,
+            environment=self.runtime.environment,
             name=self.name,
             host_config=self.client.create_host_config(
                 port_bindings={

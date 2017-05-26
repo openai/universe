@@ -3,4 +3,4 @@ flashgames:
 gym-core:
   tag: 0.20.6
 world-of-bits:
-  tag: 0.20.1-dev7
+  tag: 0.20.12
