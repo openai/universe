@@ -49,7 +49,7 @@ Take a vectorized environment with a batch of size 1 and turn it into an unvecto
     def _step(self, action):
         action_n = [action]
         observation_n, reward_n, done_n, info = self.env.step(action_n)
-        return observation_n[0], reward_n[0], done_n[0], info['n'][0]
+        return observation_n[0], reward_n[0], done_n[0], info
 
     def _seed(self, seed):
         return self.env.seed([seed])[0]

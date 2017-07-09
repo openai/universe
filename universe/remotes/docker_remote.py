@@ -80,7 +80,7 @@ class DockerManager(object):
         self.instances = [DockerInstance(self._assigner, self.runtime, label=str(i)) for i in range(self._n)]
 
         [instance.start() for instance in self.instances]
-        self.start_logging(self.instances)
+        #self.start_logging(self.instances)
         self.healthcheck(self.instances)
 
     def close(self):

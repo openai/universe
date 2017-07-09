@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import uuid
+import time
 
 import universe
 from gym.utils import reraise
@@ -129,6 +130,8 @@ class VNCEnv(vectorized.Env):
 
         self._send_actions_over_websockets = False
         self._skip_network_calibration = False
+        self.timers = [time.time()] * 16
+        self.time_limit = 180.0
 
 
     def _seed(self, seed):
@@ -429,6 +432,15 @@ class VNCEnv(vectorized.Env):
         # that everything here is asynchronous!
         if self.rewarder_session:
             reward_n, done_n, info_n, err_n = self._pop_rewarder_session(peek_d)
+            # diffs = [time.time() - x for x in self.timers]
+            # for i, done in enumerate(done_n):
+            #     if done:
+            #         print("Env got reset {}".format(i))
+            #     if diffs[i] > self.time_limit:
+            #         print("Resetting env {}".format(i))
+            #         done_n[i] = True
+            #     if done_n[i]:
+            #         self.timers[i] = time.time()
         else:
             reward_n = done_n = [None] * self.n
             info_n = [{} for _ in range(self.n)]

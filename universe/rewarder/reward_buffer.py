@@ -103,6 +103,8 @@ class RewardBuffer(object):
         self._remote_env_id = None
         self._remote_episode_id = None
         self._remote_fps = None
+        self.timer = 90
+        self.timestamp = time.time()
 
     def reward_state(self, episode_id):
         try:
@@ -193,6 +195,7 @@ class RewardBuffer(object):
                 }
 
             reward, done, info = self.reward_state(self._current_episode_id).pop()
+
             if done:
                 # We return the *observation* from the new,
                 # reward/done from the old, and a merged info with

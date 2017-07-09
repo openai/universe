@@ -262,11 +262,19 @@ class RewarderSession(object):
         done_d = {}
         info_d = {}
         err_d = self.pop_errors()
-
         for i, reward_buffer in self.reward_buffers.items():
             name = self.names_by_id[i]
-
             reward, done, info = reward_buffer.pop(peek_d.get(name))
+            if time.time() - reward_buffer.timestamp > reward_buffer.timer:
+                print("TIME TO RESET {}".format(i))
+                client = self.clients[i]
+                self._send_env_reset(client)
+                reward_buffer.timestamp = time.time()
+                import random
+                reward_buffer.timer = 90 + random.randint(-5, 5)
+                done = True
+            if done:
+                reward_buffer.timestamp = time.time()
             reward_d[name] = reward
             done_d[name] = done
             info_d[name] = info
