@@ -1,8 +1,7 @@
+**This repository has been deprecated in favor of the Retro (https://github.com/openai/retro) library. See our Retro Contest (https://blog.openai.com/retro-contest) blog post for detalis.**
+
 universe
 ***************
-
-.. image:: https://travis-ci.org/openai/universe.svg?branch=master
-    :target: https://travis-ci.org/openai/universe
 
 `Universe <https://openai.com/blog/universe/>`_ is a software
 platform for measuring and training an AI's general intelligence
